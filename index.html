@@ -9,10 +9,23 @@
 </head>
 <body>
     <div>
-        this is a synth
-        <button onclick="play()">Play/Stop</button>
+        <h1>this is a synth</h1>
+        <audio src="assets/audio/brahms_3_mvt3.m4a" id="audio" type="HTMLMediaElement"></audio>
+        <button data-playing="false" role="switch" aria-check="false" id="play">
+            <span>Play/Pause</span>
+        </button>
+        <!-- <button data-playing="false" onclick="play()" id="play">Play/Stop</button> -->
+        <br>
+        <label for="master-gain">Master Gain</label>
+        <input type="range" id="master-gain" value="100" onchange="changeGain()">
+        <br>
         <label for="slider">Freq</label>
-        <input type="range" id="slider" onchange="changefreq()">
+        <input type="range" id="freqslider" onchange="changeFreq()">
+        <br>
+        <label for="sine">Sine</label>
+        <input type="radio" name="waveform" id="sine" value="sine">
+        <label for="triangle">Triangle</label>
+        <input type="radio" name="waveform" id="triangle" value="triangle">
     </div>
 </body>
 </html>
