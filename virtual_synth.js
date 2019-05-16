@@ -15,31 +15,36 @@ window.onload = () => {
         "numberOfChannels": 2,
         "sampleRate": 44100,
     };
-    let osc;
+    let osc, buffer, source;
     let isPlaying = false;
 
 
     const master = c.createGain();
     master.connect(c.destination);
+
     const request = new XMLHttpRequest();
     request.open('GET', 'assets/audio/brahms_3_mvt3.mp3', true);
     request.responseType = "arraybuffer";
     request.onload = function () {
         c.decodeAudioData(request.response, function(b) {
             buffer = b; //set the buffer
+            source = c.createBufferSource();
+            source.buffer = buffer;
+            source.connect(c.destination);
+            
             data = buffer.getChannelData(0);
-            console.log(buffer);
             isloaded = true;
+            console.log('loaded');
             // var canvas1 = document.getElementById('canvas');
             //initialize the processing draw when the buffer is ready
             // var processing = new Processing(canvas1, waveformdisplay);
-            console.log(data);
-
         }, function () {
             console.log('loading failed');
         });
     };
+    
     request.send();
+
 
     
     // const audioElement = new Audio('assets/audio/brahms_3_mvt3.mp3');
@@ -53,11 +58,14 @@ window.onload = () => {
             c.resume();
         } 
         if (this.dataset.playing === 'false'){
-            buffer.play();
+            source.start(c.currentTime);
             this.dataset.playing = 'true';
+            console.log('playing');
+            debugger
         } else if (this.dataset.playing === 'true') {
-            buffer.pause();
+            source.stop(c.currentTime);
             this.dataset.playing = 'false';
+            console.log("paused");
         }
     }, false);
     // playButton.addEventListener('click', function() {
