@@ -73,14 +73,26 @@ window.onload = () => {
             console.log('playing');
     });
 
+    const grains = [];
+    let grainCount = 0;
+
+    const play = () => {
+        const grain = new Grain(buffer);
+        grains[grainCount] = grain;
+        grainCount += 1;
+        window.setTimeout(play, Math.random() * 500);
+    };
+
     const grain = document.getElementById("grain");
     grain.addEventListener('click', function() {
             // scheduled start, audio start time, sample length
-            const grain = new Grain(buffer);
-            grain.source.start(c.currentTime, Math.random() * 2 + 20, 6);
-            grain.source.onended = () => {
-                console.log("file has ended");
-            };
+            play();
+            
+
+            
+            // grain.source.onended = () => {
+            //     console.log("file has ended");
+            // };
             console.log('playing');
     });
 
@@ -108,17 +120,16 @@ class Grain {
         this.now = c.currentTime;
         this.source = c.createBufferSource();
         this.source.buffer = buffer;
-        this.attack = 0.02;
-        this.release = 0.02;
+        this.attack = Math.random() * 0.3;
+        this.release = Math.random() * 0.3;
 
         this.bus = c.createGain();
         this.bus.connect(master);
         this.bus.connect(convolver);
         this.source.connect(this.bus);
-
         
+        this.source.start(c.currentTime, Math.random() * 3 + 20, this.attack + this.release);
         this.bus.gain.setValueAtTime(0, this.now);
-
         // value, endtime
         this.bus.gain.linearRampToValueAtTime(50, this.now + this.attack);
         this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.release);
