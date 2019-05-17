@@ -1,4 +1,3 @@
-import { c } from './audio_context';
 export const reverb = c.createConvolver();
 let source, hallBuffer;
 

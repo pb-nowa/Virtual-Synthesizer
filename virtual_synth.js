@@ -1,5 +1,53 @@
-import { c, masterbus } from './audio_context';
 import Grain from './grain.js';
+
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+
+export const c = new AudioContext();
+export const master = c.createGain();
+export const masterbus = c.createGain();
+
+export const delay = new DelayNode(c, {
+    delayTime: 0.4,
+    maxDelayTime: 0.4,
+});
+
+export const hipass = new BiquadFilterNode(c, {
+    type: 'highpass',
+    frequency: 0,
+});
+
+export const lopass = new BiquadFilterNode(c, {
+    type: 'lowpass',
+    frequency: 10000,
+});
+
+export const reverb = c.createConvolver();
+let source, hallBuffer;
+
+const request = new XMLHttpRequest();
+request.open('GET', 'assets/audio/large_hall.wav', true);
+request.responseType = "arraybuffer";
+request.onload = function () {
+    c.decodeAudioData(request.response, function (buffer) {
+        hallBuffer = buffer;
+        source = c.createBufferSource();
+        source.buffer = hallBuffer;
+        console.log('reverb loaded');
+    }, function (e) {
+        console.log('loading failed' + e.err);
+    });
+};
+request.send();
+
+reverb.buffer = hallBuffer;
+
+masterbus.connect(reverb);
+masterbus.connect(c.destination);
+reverb.connect(master);
+
+// master.connect(c.destination);
+master.connect(c.destination);
+// delay.connect(c.destination);
 
 window.onload = () => {
     let buffer, source, data;
@@ -26,7 +74,7 @@ window.onload = () => {
             // scheduled start, audio start time, sample length
             source = c.createBufferSource();
             source.buffer = buffer;
-            source.connect(masterbus);
+            source.connect(c.destination);
             source.start(c.currentTime, 6);
             source.onended = () => {
                 console.log("file has ended");
@@ -82,4 +130,84 @@ window.onload = () => {
         play();
     };
 };
+/////////////////////////////////////////////////////////
+const canvas = document.getElementById("sphere");
 
+
+let width = canvas.offsetWidth;
+let height = canvas.offsetHeight;
+
+
+const ctx = canvas.getContext('2d');
+
+//https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
+// If the screen device has a pixel ratio over 1
+// We render the canvas twice bigger to make it sharper (e.g. Retina iPhone)
+if (window.devicePixelRatio > 1) {
+    canvas.width = canvas.clientWidth * 2;
+    canvas.height = canvas.clientHeight * 2;
+    ctx.scale(2, 2);
+} else {
+    canvas.width = width;
+    canvas.height = height;
+}
+
+let PERSPECTIVE = width * 0.8;
+let PROJECTION_CENTER_X = width / 2;
+let PROJECTION_CENTER_Y = height / 2;
+const DOT_RADIUS = 10;
+let GLOBE_RADIUS = width / 3;
+const particles = [];
+
+class Particle {
+    constructor() {
+        this.theta = Math.random() * 2 * Math.PI;
+        //multiply MathRandom by acos so that the partcles don't clump near the poles
+        this.phi = Math.acos((Math.random() * 2) - 1);
+
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+
+        this.xProjected = 0; // x coordinate on the 2D world
+        this.yProjected = 0; // y coordinate on the 2D world
+        this.scaleProjected = 0;
+    }
+
+    //transforms the 3d coordinates into 2d coordinates
+    project() {
+        this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
+        this.y = GLOBE_RADIUS * Math.cos(this.phi);
+        this.z = GLOBE_RADIUS * Math.sin(this.phi) * Math.sin(this.theta) + GLOBE_RADIUS;
+
+        this.scaleProjected = PERSPECTIVE / (PERSPECTIVE + this.z);
+        this.xProjected = (this.x * this.scaleProjected) + PROJECTION_CENTER_X;
+        this.yProjected = (this.y * this.scaleProjected) + PROJECTION_CENTER_Y;
+    }
+
+    draw() {
+        this.project();
+        //opacity based on distance
+        ctx.globalAlpha = Math.abs(1 - this.z / width);
+        
+        ctx.beginPath();
+        //x, y ,r, angle-start, angle-end
+        ctx.arc(this.xProjected, this.yProjected, DOT_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+}
+
+for (let i = 0; i < 800; i++) {
+    particles.push(new Particle());
+}
+
+function render() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
+    }
+}
+
+window.requestAnimationFrame(render);
