@@ -38,7 +38,7 @@ window.onload = () => {
             source = c.createBufferSource();
             source.buffer = buffer;
             source.connect(master);
-            source.start(c.currentTime, 20, 6);
+            source.start(c.currentTime, 6);
             source.onended = () => {
                 console.log("file has ended");
             };
@@ -50,7 +50,7 @@ window.onload = () => {
             // scheduled start, audio start time, sample length
             const grain = new Grain(buffer);
             console.log(grain);
-            grain.source.start(c.currentTime, 20, 6);
+            grain.source.start(c.currentTime, Math.random() * 2 + 20, 6);
             grain.source.onended = () => {
                 console.log("file has ended");
             };
@@ -87,8 +87,8 @@ class Grain {
         this.now = c.currentTime;
         this.source = c.createBufferSource();
         this.source.buffer = buffer;
-        this.attack = 2;
-        this.release = 2;
+        this.attack = 0.02;
+        this.release = 0.02;
 
         this.bus = c.createGain();
         this.bus.connect(master);
@@ -98,7 +98,7 @@ class Grain {
         this.bus.gain.setValueAtTime(0, this.now);
 
         // value, endtime
-        this.bus.gain.linearRampToValueAtTime(50, this.now + 2);
+        this.bus.gain.linearRampToValueAtTime(50, this.now + this.attack);
         this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.release);
 
     }
