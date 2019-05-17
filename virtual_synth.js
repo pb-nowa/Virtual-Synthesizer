@@ -80,7 +80,7 @@ window.onload = () => {
         const grain = new Grain(buffer);
         grains[grainCount] = grain;
         grainCount += 1;
-        window.setTimeout(play, Math.random() * 500);
+        window.setTimeout(play, Math.random() * 100);
     };
 
     const grain = document.getElementById("grain");
@@ -120,19 +120,23 @@ class Grain {
         this.now = c.currentTime;
         this.source = c.createBufferSource();
         this.source.buffer = buffer;
-        this.attack = Math.random() * 0.3;
-        this.release = Math.random() * 0.3;
+        this.attack = Math.random() * 0.2;
+        this.release = Math.random() * 0.2;
+        this.playbackSampleStart = 24; //where in the audio file to start playing
 
         this.bus = c.createGain();
         this.bus.connect(master);
         this.bus.connect(convolver);
         this.source.connect(this.bus);
         
-        this.source.start(c.currentTime, Math.random() * 3 + 20, this.attack + this.release);
+        this.play();
+    }
+
+    play(){
+        this.source.start(c.currentTime, Math.random() * 2 + this.playbackSampleStart, this.attack + this.release);
         this.bus.gain.setValueAtTime(0, this.now);
         // value, endtime
         this.bus.gain.linearRampToValueAtTime(50, this.now + this.attack);
         this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.release);
-
     }
 }
