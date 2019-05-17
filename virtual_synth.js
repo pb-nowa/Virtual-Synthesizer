@@ -193,6 +193,12 @@ class Particle {
         ctx.beginPath();
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, DOT_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+        const r = 70;
+        const g = 255;
+        const b = 140;
+
+        const rgbString = "rgba(" + r + "," + g + "," + b + ")";
+        ctx.fillStyle = 'rgb(0, 212, 212)';
         ctx.fill();
     }
 
