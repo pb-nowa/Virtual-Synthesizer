@@ -1,4 +1,5 @@
 import Grain from './grain.js';
+import { domainToASCII } from 'url';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -152,10 +153,10 @@ if (window.devicePixelRatio > 1) {
     canvas.height = height;
 }
 
-let PERSPECTIVE = width * 0.8;
+let PERSPECTIVE = width * 0.3;
 let PROJECTION_CENTER_X = width / 2;
 let PROJECTION_CENTER_Y = height / 2;
-const DOT_RADIUS = 10;
+const PARTICLE_RADIUS = 4;
 let GLOBE_RADIUS = width / 3;
 const particles = [];
 
@@ -192,7 +193,7 @@ class Particle {
         
         ctx.beginPath();
         //x, y ,r, angle-start, angle-end
-        ctx.arc(this.xProjected, this.yProjected, DOT_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+        ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
         const r = 70;
         const g = 255;
         const b = 140;
@@ -204,12 +205,20 @@ class Particle {
 
 }
 
-for (let i = 0; i < 800; i++) {
+for (let i = 0; i < 1500; i++) {
     particles.push(new Particle());
 }
 
 function render() {
     ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++){
+        particles[i].project();
+    }
+    //sort particles by their z index 
+    particles.sort((dot1, dot2) => {
+        return dot1.sizeProjection - dot2.sizeProjection;
+    });
 
     for (let i = 0; i < particles.length; i++) {
         particles[i].draw();
