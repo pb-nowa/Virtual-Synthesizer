@@ -22,8 +22,10 @@
         <label for="master-gain">Master Gain</label>
         <input type="range" id="master-gain" value="100" onchange="changeGain()">
         <br>
-        <label for="slider">Freq</label>
-        <input type="range" id="freqslider" onchange="changeFreq()">
+        <label for="hipass">hi-pass</label>
+        <input type="range" id="hipass" min="0" max="4000" value="0" onchange="updateHipassFilter()">
+        <label for="lopass">Lopass</label>
+        <input type="range" min="100" max="10000" value="10000" id="lopass" onchange="updateLopassFilter()">
         <br>
         <label for="sine">Sine</label>
         <input type="radio" name="waveform" id="sine" value="sine">
