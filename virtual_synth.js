@@ -1,9 +1,39 @@
-
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 const c = new AudioContext();
 const master = c.createGain();
+const convolver = c.createConvolver(); //this uses the whole audio file
+const delay = new DelayNode(c, {
+    delayTime: 0.2,
+    maxDelayTime: 2,
+});
+
+/////////////////
+
+const reverb = c.createConvolver();
+
+// https://developer.mozilla.org/en-US/docs/Web/API/ConvolverNode
+// const base64ToArrayBuffer = base64 => {
+//     const binaryString = window.atob(base64);
+//     const length = binaryString.length;
+//     const bytes = new Uint8Array(length);
+//     for (var i = 0; i < length; i++) {
+//         bytes[i] = binaryString.charCodeAt(i);
+//     }
+//     return bytes.buffer;
+// };
+
+// const reverbSoundArrayBuffer = base64ToArrayBuffer(impulseResponse);
+// c.decodeAudioData(reverbSoundArrayBuffer, buffer => {
+//     reverb.buffer = buffer;
+// }, e => {
+//     alert('Error when decoding audio data ' + e.err);
+// });
+//////////////
 master.connect(c.destination);
+// convolver.connect(c.destination);
+delay.connect(c.destination);
+
 
 window.onload = () => {
     let buffer, source;
@@ -18,6 +48,9 @@ window.onload = () => {
             data = buffer.getChannelData(0);
             isloaded = true;
             console.log('loaded');
+            const hall = buffer;
+            convolver.buffer = hall; //apply a buffer to the convolution verb
+
         }, function () {
             console.log('loading failed');
         });
@@ -27,13 +60,8 @@ window.onload = () => {
 
 
     
-    // const audioElement = new Audio('assets/audio/brahms_3_mvt3.mp3');
-
-    // const track = c.createMediaElementSource(audioElement);
-    // track.connect(master);
-    
     const playButton = document.getElementById("play");
-    playButton.addEventListener('click', function() {
+    playButton.addEventListener('click', function(){
             // scheduled start, audio start time, sample length
             source = c.createBufferSource();
             source.buffer = buffer;
@@ -49,7 +77,6 @@ window.onload = () => {
     grain.addEventListener('click', function() {
             // scheduled start, audio start time, sample length
             const grain = new Grain(buffer);
-            console.log(grain);
             grain.source.start(c.currentTime, Math.random() * 2 + 20, 6);
             grain.source.onended = () => {
                 console.log("file has ended");
@@ -74,12 +101,6 @@ window.onload = () => {
         play();
         play();
     };
-
-    changeType = () => {
-        oscProp.type = document.querySelector("input[name = 'waveform']:checked").value;
-        play();
-        play();
-    };
 };
 
 class Grain {
@@ -92,9 +113,10 @@ class Grain {
 
         this.bus = c.createGain();
         this.bus.connect(master);
+        this.bus.connect(convolver);
         this.source.connect(this.bus);
 
-
+        
         this.bus.gain.setValueAtTime(0, this.now);
 
         // value, endtime
@@ -103,5 +125,3 @@ class Grain {
 
     }
 }
-
-
