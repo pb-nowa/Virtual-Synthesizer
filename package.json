@@ -1,0 +1,25 @@
+{
+  "name": "virtual_synth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "virtual_synth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --watch --mode=development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pb-nowa/Virtual-Synthesizer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pb-nowa/Virtual-Synthesizer/issues"
+  },
+  "homepage": "https://github.com/pb-nowa/Virtual-Synthesizer#readme",
+  "dependencies": {
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  }
+}
