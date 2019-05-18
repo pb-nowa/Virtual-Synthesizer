@@ -26,6 +26,15 @@ export const lopass = new BiquadFilterNode(c, {
 export const reverb = c.createConvolver();
 let source, hallBuffer;
 
+// const analyser = new AnalyserNode(c, {
+//     fftSize: 2048,
+//     maxDecibles: -30,
+//     minDecibels: -100,
+//     smoothingTimeConstant: 0.8
+// });
+
+const analyser = c.createAnalyser();
+
 const request = new XMLHttpRequest();
 request.open('GET', 'assets/audio/large_hall.wav', true);
 request.responseType = "arraybuffer";
@@ -41,16 +50,15 @@ request.onload = function () {
 };
 request.send();
 
-
-
 reverb.buffer = hallBuffer;
 
 masterbus.connect(reverb);
-masterbus.connect(c.destination);
-reverb.connect(master);
+masterbus.connect(master);
+// reverb.connect(master);
 
 // master.connect(c.destination);
-master.connect(c.destination);
+master.connect(analyser);
+analyser.connect(c.destination);
 // delay.connect(c.destination);
 
 window.onload = () => {
@@ -77,7 +85,7 @@ window.onload = () => {
             // scheduled start, audio start time, sample length
             source = c.createBufferSource();
             source.buffer = buffer;
-            source.connect(c.destination);
+            source.connect(masterbus);
             source.start(c.currentTime, 6);
             source.onended = () => {
                 console.log("file has ended");
@@ -164,10 +172,14 @@ let PERSPECTIVE = width * 0.3;
 let PROJECTION_CENTER_X = width / 2;
 let PROJECTION_CENTER_Y = height / 2;
 const PARTICLE_RADIUS = 4;
-let GLOBE_RADIUS = width / 3;
+// let GLOBE_RADIUS = width / 3;
+let GLOBE_RADIUS = 40;
 let particles = [];
 class Particle {
-    constructor() {
+    constructor(analyser) {
+        this.analyser = analyser;
+        let bufferLength = this.analyser.frequencyBinCount;
+
         this.theta = Math.random() * 2 * Math.PI;
         //multiply MathRandom by acos so that the partcles don't clump near the poles
         this.phi = Math.acos((Math.random() * 2) - 1);
@@ -184,6 +196,18 @@ class Particle {
     // Projection translation from 2d to 3d from:
     // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
     project() {
+        const timeFrequencyData = new Uint8Array(this.analyser.fftSize);
+        const timeFloatData = new Float32Array(this.analyser.fftSize);
+        const dataArray = new Float32Array(this.analyser.frequencyBinCount);
+
+        // https://github.com/danstans/react-media-visualizer
+        this.analyser.getByteTimeDomainData(timeFrequencyData);
+        this.analyser.getFloatTimeDomainData(timeFloatData);
+        this.analyser.getFloatFrequencyData(dataArray);
+        // console.log(dataArray[500]);
+        GLOBE_RADIUS = Math.pow(dataArray[0] + 100, 3/2); 
+        
+       
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
         this.y = GLOBE_RADIUS * Math.cos(this.phi);
         this.z = GLOBE_RADIUS * Math.sin(this.phi) * Math.sin(this.theta) + GLOBE_RADIUS;
@@ -216,7 +240,7 @@ function render() {
     ctx.clearRect(0, 0, width, height);
     particles = [];
     for (let i = 0; i < 800; i++) {
-        particles.push(new Particle());
+        particles.push(new Particle(analyser));
     }
 
     for (let i = 0; i < particles.length; i++){

@@ -1,8 +1,17 @@
 class Particle {
-    constructor() {
+    constructor(analyser) {
+        this.analyser = analyser;
+        let bufferLength = this.analyser.frequencyBinCount;
+
+        var timeFrequencyData = new Uint8Array(this.analyser.fftSize);
+        var timeFloatData = new Float32Array(this.analyser.fftSize);
+        this.analyser.getByteTimeDomainData(timeFrequencyData);
+        this.analyser.getFloatTimeDomainData(timeFloatData);
+
         this.theta = Math.random() * 2 * Math.PI;
         //multiply MathRandom by acos so that the partcles don't clump near the poles
         this.phi = Math.acos((Math.random() * 2) - 1);
+
 
         this.x = 0;
         this.y = 0;
