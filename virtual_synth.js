@@ -134,24 +134,29 @@ window.onload = () => {
 /////////////////////////////////////////////////////////
 const canvas = document.getElementById("sphere");
 
-
 let width = canvas.offsetWidth;
 let height = canvas.offsetHeight;
 
 
 const ctx = canvas.getContext('2d');
 
-//https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
-// If the screen device has a pixel ratio over 1
-// We render the canvas twice bigger to make it sharper (e.g. Retina iPhone)
-if (window.devicePixelRatio > 1) {
-    canvas.width = canvas.clientWidth * 2;
-    canvas.height = canvas.clientHeight * 2;
-    ctx.scale(2, 2);
-} else {
-    canvas.width = width;
-    canvas.height = height;
+function onResize() {
+    width = canvas.offsetWidth;
+    height = canvas.offsetHeight;
+    // If the screen device has a pixel ratio over 1
+    // We render the canvas twice bigger to make it sharper (e.g. Retina iPhone)
+    if (window.devicePixelRatio > 1) {
+        canvas.width = canvas.clientWidth * 2;
+        canvas.height = canvas.clientHeight * 2;
+        ctx.scale(2, 2);
+    } else {
+        canvas.width = width;
+        canvas.height = height;
+    }
 }
+
+window.addEventListener('resize', onResize);
+onResize();
 
 let PERSPECTIVE = width * 0.3;
 let PROJECTION_CENTER_X = width / 2;
@@ -169,12 +174,13 @@ class Particle {
         this.y = 0;
         this.z = 0;
 
-        this.xProjected = 0; // x coordinate on the 2D world
-        this.yProjected = 0; // y coordinate on the 2D world
+        this.xProjected = 0; 
+        this.yProjected = 0;
         this.scaleProjected = 0;
     }
 
-    //transforms the 3d coordinates into 2d coordinates
+    // Projection translation from 2d to 3d from:
+    // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
     project() {
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
         this.y = GLOBE_RADIUS * Math.cos(this.phi);
@@ -207,13 +213,14 @@ class Particle {
 function render() {
     ctx.clearRect(0, 0, width, height);
     particles = [];
-    for (let i = 0; i < 1500; i++) {
+    for (let i = 0; i < 800; i++) {
         particles.push(new Particle());
     }
 
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
     }
+
     //sort particles by their z index 
     particles.sort((dot1, dot2) => {
         return dot1.sizeProjection - dot2.sizeProjection;
@@ -222,12 +229,13 @@ function render() {
     for (let i = 0; i < particles.length; i++) {
         particles[i].draw();
     }
+
     window.requestAnimationFrame(render);
 
 }
-    // window.setInterval(render(), 80);
 
 function init() {
     window.requestAnimationFrame(render);
 }
+
 init();
