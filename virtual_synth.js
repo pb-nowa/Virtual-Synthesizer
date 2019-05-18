@@ -1,5 +1,5 @@
 import Grain from './grain.js';
-import { domainToASCII } from 'url';
+// import Particle from './particle.js';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -159,7 +159,6 @@ let PROJECTION_CENTER_Y = height / 2;
 const PARTICLE_RADIUS = 4;
 let GLOBE_RADIUS = width / 3;
 const particles = [];
-
 class Particle {
     constructor() {
         this.theta = Math.random() * 2 * Math.PI;
@@ -190,7 +189,7 @@ class Particle {
         this.project();
         //opacity based on distance
         ctx.globalAlpha = Math.abs(1 - this.z / width);
-        
+
         ctx.beginPath();
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
@@ -205,12 +204,12 @@ class Particle {
 
 }
 
-for (let i = 0; i < 1500; i++) {
-    particles.push(new Particle());
-}
-
 function render() {
     ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < 1500; i++) {
+        particles.push(new Particle());
+    }
 
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
@@ -223,6 +222,12 @@ function render() {
     for (let i = 0; i < particles.length; i++) {
         particles[i].draw();
     }
-}
+    window.requestAnimationFrame(render);
 
-window.requestAnimationFrame(render);
+}
+    // window.setInterval(render(), 80);
+
+function init() {
+    window.requestAnimationFrame(render);
+}
+init();

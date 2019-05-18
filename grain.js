@@ -1,4 +1,4 @@
-import { c, masterbus } from './audio_context.js';
+import { c, masterbus } from './virtual_synth.js';
 
 class Grain {
     constructor(buffer) {
