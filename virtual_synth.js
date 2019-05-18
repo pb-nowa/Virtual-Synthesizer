@@ -158,7 +158,7 @@ let PROJECTION_CENTER_X = width / 2;
 let PROJECTION_CENTER_Y = height / 2;
 const PARTICLE_RADIUS = 4;
 let GLOBE_RADIUS = width / 3;
-const particles = [];
+let particles = [];
 class Particle {
     constructor() {
         this.theta = Math.random() * 2 * Math.PI;
@@ -206,7 +206,7 @@ class Particle {
 
 function render() {
     ctx.clearRect(0, 0, width, height);
-
+    particles = [];
     for (let i = 0; i < 1500; i++) {
         particles.push(new Particle());
     }
