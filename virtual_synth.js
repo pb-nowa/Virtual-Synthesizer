@@ -1,4 +1,5 @@
 import Grain from './grain.js';
+// import { request } from './request.js';
 // import Particle from './particle.js';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -40,6 +41,8 @@ request.onload = function () {
 };
 request.send();
 
+
+
 reverb.buffer = hallBuffer;
 
 masterbus.connect(reverb);
@@ -53,8 +56,6 @@ master.connect(c.destination);
 window.onload = () => {
     let buffer, source, data;
 
-    //brahms_3_mvt3
-    //import audio file
     const request = new XMLHttpRequest();
     request.open('GET', 'assets/audio/reverie.mp3', true);
     request.responseType = "arraybuffer";
@@ -69,6 +70,7 @@ window.onload = () => {
         });
     };
     request.send();
+
     
     const playButton = document.getElementById("play");
     playButton.addEventListener('click', function(){
