@@ -26,14 +26,14 @@ export const lopass = new BiquadFilterNode(c, {
 export const reverb = c.createConvolver();
 let source, hallBuffer;
 
-// const analyser = new AnalyserNode(c, {
-//     fftSize: 2048,
-//     maxDecibles: -30,
-//     minDecibels: -100,
-//     smoothingTimeConstant: 0.8
-// });
+const analyser = new AnalyserNode(c, {
+    fftSize: 2048,
+    maxDecibles: -30,
+    minDecibels: -100,
+    smoothingTimeConstant: 0.95
+});
 
-const analyser = c.createAnalyser();
+// const analyser = c.createAnalyser();
 
 const request = new XMLHttpRequest();
 request.open('GET', 'assets/audio/large_hall.wav', true);
@@ -200,7 +200,6 @@ class Particle {
         const timeFloatData = new Float32Array(this.analyser.fftSize);
         const dataArray = new Float32Array(this.analyser.frequencyBinCount);
 
-        // https://github.com/danstans/react-media-visualizer
         this.analyser.getByteTimeDomainData(timeFrequencyData);
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
