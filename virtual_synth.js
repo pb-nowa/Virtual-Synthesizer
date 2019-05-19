@@ -3,7 +3,7 @@ import { getBuffer } from './get_buffer';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let playing = false;
-
+let loaded = false;
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
@@ -60,7 +60,8 @@ window.onload = () => {
         revBuffer = await getBuffer(c, '/assets/audio/reverie.mp3');
         Array.prototype.reverse.call(revBuffer.getChannelData(0));
         Array.prototype.reverse.call(revBuffer.getChannelData(1));
-        console.log('loaded');
+        loaded = true;
+        console.log(loaded);
     }
 
     initBuffer();
@@ -146,7 +147,7 @@ let GLOBE_RADIUS = 40;
 let particles = [];
 
 class Particle {
-    constructor(analyser, theta, phi, x, y, z) {
+    constructor({analyser, theta, phi, x, y, z, rad}) {
         this.analyser = analyser;
 
         this.theta = theta || Math.random() * 2 * Math.PI;
@@ -160,6 +161,8 @@ class Particle {
         this.xProjected = x || 0; 
         this.yProjected = y || 0;
         this.scaleProjected = z || 0;
+        this.rad = rad || 2; 
+
     }
 
     // Projection translation from 2d to 3d from:
@@ -173,8 +176,9 @@ class Particle {
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
 
-        rad = Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2); 
-        GLOBE_RADIUS = rad;
+        this.rad = Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2); 
+        rad = Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3 / 2);
+        GLOBE_RADIUS = this.rad;
         
        
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
@@ -226,6 +230,7 @@ function draw(ctx, img, x, y, w, h){
 function render(ctx) {
     ctx.clearRect(0, 0, width, height);
 
+    //play and pause button
     if (playing) {
         draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
     } else {
@@ -234,20 +239,20 @@ function render(ctx) {
     
     if (!particles.length) {
         for (let i = 0; i < density; i++) {
-            particles.push(new Particle(analyser));
+            particles.push(new Particle({analyser}));
         }
     } else {
         const preParticles = Array.from(particles);
         particles = [];
         for (let i = 0; i < density; i++) {
-            particles.push(new Particle(
-                analyser, 
-                preParticles[i].theta,
-                preParticles[i].phi,
-                preParticles[i].x, 
-                preParticles[i].y, 
-                preParticles[i].z)
-            );
+            particles.push(new Particle({
+                analyser: analyser, 
+                theta: preParticles[i].theta,
+                phi: preParticles[i].phi,
+                x: preParticles[i].x, 
+                y: preParticles[i].y, 
+                z: preParticles[i].z
+            }));
         }  
     }
 
