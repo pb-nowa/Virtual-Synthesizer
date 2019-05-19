@@ -1,8 +1,5 @@
 import Grain from './grain.js';
-// import Reverb from './reverb.js';
-import { getBuffer } from './impulse';
-// import { request } from './request.js';
-// import Particle from './particle.js';
+import { getBuffer } from './get_buffer';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -37,12 +34,6 @@ const analyser = new AnalyserNode(c, {
     smoothingTimeConstant: 0.97
 });
 
-// const reverb = new Reverb(c, { 
-//     roomSize: 0.9, 
-//     dampening: 3000, 
-//     wetGain: 0.8, 
-//     dryGain: 0.2 
-// });
 let convolver;
 
 async function setReverb() {
@@ -54,13 +45,10 @@ async function setReverb() {
 setReverb();
 
 masterbus.connect(master);
-// masterbus.connect(reverb);
-// reverb.connect(master);
 
 lfo.connect(master.gain);
 // lfo.start();
 master.connect(analyser);
-// analyser.connect(c.destination);
 
 
 
