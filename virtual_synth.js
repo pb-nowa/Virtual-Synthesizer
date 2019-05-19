@@ -30,7 +30,7 @@ const analyser = new AnalyserNode(c, {
     fftSize: 2048,
     maxDecibles: -30,
     minDecibels: -100,
-    smoothingTimeConstant: 0.95
+    smoothingTimeConstant: 0.97
 });
 
 // const analyser = c.createAnalyser();
@@ -86,7 +86,7 @@ window.onload = () => {
             source = c.createBufferSource();
             source.buffer = buffer;
             source.connect(masterbus);
-            source.start(c.currentTime, 6);
+            source.start(c.currentTime, 30);
             source.onended = () => {
                 console.log("file has ended");
             };
@@ -176,21 +176,20 @@ const PARTICLE_RADIUS = 4;
 let GLOBE_RADIUS = 40;
 let particles = [];
 class Particle {
-    constructor(analyser) {
+    constructor(analyser, theta, phi, x, y, z) {
         this.analyser = analyser;
-        let bufferLength = this.analyser.frequencyBinCount;
 
-        this.theta = Math.random() * 2 * Math.PI;
+        this.theta = theta || Math.random() * 2 * Math.PI;
         //multiply MathRandom by acos so that the partcles don't clump near the poles
-        this.phi = Math.acos((Math.random() * 2) - 1);
+        this.phi = phi || Math.acos((Math.random() * 2) - 1);
 
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
 
-        this.xProjected = 0; 
-        this.yProjected = 0;
-        this.scaleProjected = 0;
+        this.xProjected = x || 0; 
+        this.yProjected = y || 0;
+        this.scaleProjected = z || 0;
     }
 
     // Projection translation from 2d to 3d from:
@@ -203,7 +202,7 @@ class Particle {
         this.analyser.getByteTimeDomainData(timeFrequencyData);
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
-        // console.log(dataArray[500]);
+
         GLOBE_RADIUS = Math.pow(dataArray[0] + 100, 3/2); 
         
        
@@ -235,11 +234,26 @@ class Particle {
 
 }
 
+let density = 800;
 function render() {
     ctx.clearRect(0, 0, width, height);
-    particles = [];
-    for (let i = 0; i < 800; i++) {
-        particles.push(new Particle(analyser));
+    if (!particles.length) {
+        for (let i = 0; i < density; i++) {
+            particles.push(new Particle(analyser));
+        }
+    } else {
+        const preParticles = Array.from(particles);
+        particles = [];
+        for (let i = 0; i < density; i++) {
+            particles.push(new Particle(
+                analyser, 
+                preParticles[i].theta,
+                preParticles[i].phi,
+                preParticles[i].x, 
+                preParticles[i].y, 
+                preParticles[i].z)
+            );
+        }  
     }
 
     for (let i = 0; i < particles.length; i++){
