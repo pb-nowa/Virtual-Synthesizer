@@ -2,7 +2,7 @@ import Grain from './grain.js';
 import { getBuffer } from './get_buffer';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-
+let playing = false;
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
@@ -17,16 +17,6 @@ const bandpass = new BiquadFilterNode(c, {
     type: 'bandpass',
     // frequency: 10,
     Q: Q
-});
-
-const hipass = new BiquadFilterNode(c, {
-    type: 'highpass',
-    frequency: 0,
-});
-
-const lopass = new BiquadFilterNode(c, {
-    type: 'lowpass',
-    frequency: 10000,
 });
 
 let lfo = new OscillatorNode(c, {
@@ -61,79 +51,58 @@ master.connect(c.destination);
 
 
 window.onload = () => {
-    let buffer, source;
+    let buffer, revBuffer, source;
 
     async function initBuffer() {
         buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
-        Array.prototype.reverse.call(buffer.getChannelData(0));
-        Array.prototype.reverse.call(buffer.getChannelData(1));
+        revBuffer = await getBuffer(c, '/assets/audio/reverie.mp3');
+        Array.prototype.reverse.call(revBuffer.getChannelData(0));
+        Array.prototype.reverse.call(revBuffer.getChannelData(1));
         console.log('loaded');
     }
 
     initBuffer();
     
-    const playButton = document.getElementById("play");
-    playButton.addEventListener('click', function(){
-            // scheduled start, audio start time, sample length
+    canvas.addEventListener('click', function(){
+        if (!playing){
             source = c.createBufferSource();
             source.buffer = buffer;
             source.connect(masterbus);
             source.start(c.currentTime, 30);
+            console.log('playing');
             source.onended = () => {
                 console.log("file has ended");
             };
-            console.log('playing');
+            playing = true;
+        } else {
+            source.stop(c.currentTime);
+            console.log('stopped');
+            playing = false;
+        }
     });
 
     const grains = [];
     let grainCount = 0;
 
-    const play = () => {
-        const grain = new Grain(c, buffer, masterbus);
-        grains[grainCount] = grain;
-        grainCount += 1;
-        window.setTimeout(play, Math.random() * 275);
-    };
+    // const play = () => {
+    //     const grain = new Grain(c, buffer, masterbus);
+    //     grains[grainCount] = grain;
+    //     grainCount += 1;
+    //     window.setTimeout(play, Math.random() * 275);
+    // };
 
-    const grain = document.getElementById("grain");
-    grain.addEventListener('click', function() {
-            play();
-            console.log('playing');
-    });
+    // canvas.addEventListener('click', function() {
+    //         play();
+    //         console.log('clicked');
+    // });
 
     const changeVolume = (ele, node) => {
         const volume = ele.value;
         const fraction = parseInt(volume) / 100;
         node.gain.value = fraction * fraction;
     };
-
-    const changeGain = () => {
-        const masterGain = document.getElementById("master-gain");
-        changeVolume(masterGain, master);
-    };
-
-    updateHipassFilter = () => {
-        const hifilter = document.getElementById("hipass");
-        hipass.frequency.setValueAtTime(hifilter.value, c.currentTime);
-        console.log(hifilter.value);
-        console.log(hipass.frequency.value);
-    };
-
-    updateLopassFilter = () => {
-        const lowfilter = document.getElementById("lopass");
-        lopass.frequency.setValueAtTime(lowfilter.value, c.currentTime);
-        console.log(lowfilter.value);
-        console.log(lopass.frequency.value);
-    };
-    
-    changeFreq = () => {
-        //the range of the range-input is from 0 - 100
-        oscProp.frequency = document.getElementById("freqslider").value * Math.exp(2);
-        play();
-        play();
-    };
 };
-/////////////////////////////////////////////////////////
+
 const canvas = document.getElementById("sphere");
 
 let width = canvas.offsetWidth;
@@ -229,8 +198,26 @@ class Particle {
 }
 
 let density = 1600;
-function render() {
+
+const img = new Image();
+img.src = "./assets/images/play_icon_hero.png";
+
+function draw(ctx, img){
+    if (!img.complete) {
+        setTimeout(() => {
+            draw(ctx, img);
+        }, 500);
+        return;
+    } else {
+        ctx.drawImage(img, width / 2 - 75, height - 130, 150, 100);
+    }
+}
+
+function render(ctx) {
     ctx.clearRect(0, 0, width, height);
+
+    draw(ctx, img);
+
     if (!particles.length) {
         for (let i = 0; i < density; i++) {
             particles.push(new Particle(analyser));
@@ -263,11 +250,11 @@ function render() {
         particles[i].draw();
     }
 
-    window.requestAnimationFrame(render);
+    window.requestAnimationFrame(() => render(ctx));
 }
 
 function init() {
-    window.requestAnimationFrame(render);
+    window.requestAnimationFrame(() => render(ctx));
 }
 
 init();
