@@ -26,6 +26,11 @@ export const lopass = new BiquadFilterNode(c, {
 export const reverb = c.createConvolver();
 let source, hallBuffer;
 
+let lfo = new OscillatorNode(c, {
+    type: 'sine',
+    frequency: 1.5,
+});
+
 const analyser = new AnalyserNode(c, {
     fftSize: 2048,
     maxDecibles: -30,
@@ -57,6 +62,8 @@ masterbus.connect(master);
 // reverb.connect(master);
 
 // master.connect(c.destination);
+lfo.connect(master.gain);
+lfo.start();
 master.connect(analyser);
 analyser.connect(c.destination);
 // delay.connect(c.destination);
@@ -203,7 +210,8 @@ class Particle {
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
 
-        GLOBE_RADIUS = Math.pow(dataArray[0] + 100, 3/2); 
+        const rad = Math.pow(dataArray[0] + 100, 3/2); 
+        GLOBE_RADIUS = rad < 0 ? 40 : rad;
         
        
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
