@@ -199,25 +199,31 @@ class Particle {
 
 let density = 1600;
 
-const img = new Image();
-img.src = "./assets/images/play_icon_hero.png";
+const play = new Image();
+play.src = "./assets/images/play_icon_hero.png";
+const pause = new Image();
+pause.src = "./assets/images/pause.png";
 
-function draw(ctx, img){
+function draw(ctx, img, x, y, w, h){
     if (!img.complete) {
         setTimeout(() => {
             draw(ctx, img);
         }, 500);
         return;
     } else {
-        ctx.drawImage(img, width / 2 - 75, height - 130, 150, 100);
+        ctx.drawImage(img, x, y, w, h);
     }
 }
 
 function render(ctx) {
     ctx.clearRect(0, 0, width, height);
 
-    draw(ctx, img);
-
+    if (playing) {
+        draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
+    } else {
+        draw(ctx, play, width / 2 - 75, height - 130, 150, 100);
+    }
+    
     if (!particles.length) {
         for (let i = 0; i < density; i++) {
             particles.push(new Particle(analyser));
