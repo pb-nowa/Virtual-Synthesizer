@@ -51,14 +51,16 @@ async function setReverb() {
     masterbus.connect(convolver).connect(c.destination);
 }
 
+setReverb();
+
 masterbus.connect(master);
 // masterbus.connect(reverb);
 // reverb.connect(master);
 
 lfo.connect(master.gain);
-lfo.start();
+// lfo.start();
 master.connect(analyser);
-analyser.connect(c.destination);
+// analyser.connect(c.destination);
 
 
 
