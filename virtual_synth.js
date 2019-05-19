@@ -1,6 +1,6 @@
 import Grain from './grain.js';
 // import Reverb from './reverb.js';
-import { getImpulseBuffer } from './impulse';
+import { getBuffer } from './impulse';
 // import { request } from './request.js';
 // import Particle from './particle.js';
 
@@ -47,7 +47,7 @@ let convolver;
 
 async function setReverb() {
     convolver = c.createConvolver();
-    convolver.buffer = await getImpulseBuffer(c, '/assets/audio/large_hall.wav');
+    convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
     masterbus.connect(convolver).connect(c.destination);
 }
 
@@ -60,24 +60,17 @@ lfo.start();
 master.connect(analyser);
 analyser.connect(c.destination);
 
+
+
 window.onload = () => {
-    let buffer, source, data;
+    let buffer, source;
 
-    const request = new XMLHttpRequest();
-    request.open('GET', 'assets/audio/reverie.mp3', true);
-    request.responseType = "arraybuffer";
-    request.onload = function () {
-        c.decodeAudioData(request.response, function(b) {
-            buffer = b; 
-            data = buffer.getChannelData(0);
-            console.log('loaded');
+    async function initBuffer() {
+        buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
+        console.log('loaded');
+    }
 
-        }, function () {
-            console.log('loading failed');
-        });
-    };
-    request.send();
-
+    initBuffer();
     
     const playButton = document.getElementById("play");
     playButton.addEventListener('click', function(){
