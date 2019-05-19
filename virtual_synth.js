@@ -1,4 +1,5 @@
 import Grain from './grain.js';
+import Reverb from './reverb.js';
 // import { request } from './request.js';
 // import Particle from './particle.js';
 
@@ -23,7 +24,7 @@ export const lopass = new BiquadFilterNode(c, {
     frequency: 10000,
 });
 
-export const reverb = c.createConvolver();
+export const convolver = c.createConvolver();
 let source, hallBuffer;
 
 let lfo = new OscillatorNode(c, {
@@ -38,6 +39,13 @@ const analyser = new AnalyserNode(c, {
     smoothingTimeConstant: 0.97
 });
 
+const reverb = new Reverb(c, { 
+    roomSize: 0.9, 
+    dampening: 3000, 
+    wetGain: 0.8, 
+    dryGain: 0.2 
+});
+
 // const analyser = c.createAnalyser();
 
 const request = new XMLHttpRequest();
@@ -48,18 +56,20 @@ request.onload = function () {
         hallBuffer = buffer;
         source = c.createBufferSource();
         source.buffer = hallBuffer;
-        console.log('reverb loaded');
+        console.log('convolver loaded');
     }, function (e) {
         console.log('loading failed' + e.err);
     });
 };
 request.send();
 
-reverb.buffer = hallBuffer;
+convolver.buffer = hallBuffer;
 
-masterbus.connect(reverb);
+masterbus.connect(convolver);
 masterbus.connect(master);
-// reverb.connect(master);
+masterbus.connect(reverb);
+reverb.connect(master);
+// convolver.connect(master);
 
 // master.connect(c.destination);
 lfo.connect(master.gain);
