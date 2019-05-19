@@ -6,6 +6,7 @@ let playing = false;
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
+const reverbBus = c.createGain();
 let Q = 12;
 
 const delay = new DelayNode(c, {
@@ -36,13 +37,12 @@ let convolver;
 async function setReverb() {
     convolver = c.createConvolver();
     convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
-    masterbus.connect(convolver).connect(bandpass).connect(master);
+    reverbBus.connect(convolver).connect(bandpass).connect(master);
 }
 
 setReverb();
 
-// masterbus.connect(master);
-
+masterbus.connect(master);
 lfo.connect(master.gain);
 // lfo.start();
 master.connect(analyser);
@@ -67,8 +67,12 @@ window.onload = () => {
         if (!playing){
             source = c.createBufferSource();
             source.buffer = buffer;
-            source.connect(masterbus);
-            source.start(c.currentTime, 30);
+            source.start(c.currentTime, 6);
+            const bus = c.createGain();
+            source.connect(bus);
+            bus.gain.linearRampToValueAtTime(-20, c.currentTime + 3);
+            bus.connect(masterbus);
+
             console.log('playing');
             source.onended = () => {
                 console.log("file has ended");
@@ -81,15 +85,24 @@ window.onload = () => {
         }
     });
 
+    canvas.addEventListener('mousemove', (e) => {
+        console.log(e.x, e.y);
+        if (e.y < 400){
+            playGrains();
+            window.setTimeout(playGrains, Math.random() * 275);
+        } else  {
+
+        }
+    });
+
     const grains = [];
     let grainCount = 0;
 
-    // const play = () => {
-    //     const grain = new Grain(c, buffer, masterbus);
-    //     grains[grainCount] = grain;
-    //     grainCount += 1;
-    //     window.setTimeout(play, Math.random() * 275);
-    // };
+    const playGrains = () => {
+        const grain = new Grain(c, buffer, reverbBus);
+        grains[grainCount] = grain;
+        grainCount += 1;
+    };
 
     // canvas.addEventListener('click', function() {
     //         play();
@@ -165,7 +178,7 @@ class Particle {
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
 
-        const rad = Math.pow(dataArray[Q] + 100, 3/2); 
+        const rad = Math.pow(dataArray[12] + 75, 3/2); 
         GLOBE_RADIUS = rad < 0 ? 40 : rad;
         
        
