@@ -6,10 +6,17 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
+let Q = 12;
 
 const delay = new DelayNode(c, {
     delayTime: 0.4,
     maxDelayTime: 0.4,
+});
+
+const bandpass = new BiquadFilterNode(c, {
+    type: 'bandpass',
+    // frequency: 10,
+    Q: Q
 });
 
 const hipass = new BiquadFilterNode(c, {
@@ -39,16 +46,17 @@ let convolver;
 async function setReverb() {
     convolver = c.createConvolver();
     convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
-    masterbus.connect(convolver).connect(c.destination);
+    masterbus.connect(convolver).connect(bandpass).connect(master);
 }
 
 setReverb();
 
-masterbus.connect(master);
+// masterbus.connect(master);
 
 lfo.connect(master.gain);
 // lfo.start();
 master.connect(analyser);
+master.connect(c.destination);
 
 
 
@@ -152,10 +160,10 @@ function onResize() {
 window.addEventListener('resize', onResize);
 onResize();
 
-let PERSPECTIVE = width * 0.3;
+let PERSPECTIVE = width * 0.7;
 let PROJECTION_CENTER_X = width / 2;
 let PROJECTION_CENTER_Y = height / 2;
-const PARTICLE_RADIUS = 4;
+const PARTICLE_RADIUS = 1.6;
 // let GLOBE_RADIUS = width / 3;
 let GLOBE_RADIUS = 40;
 let particles = [];
@@ -188,7 +196,7 @@ class Particle {
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
 
-        const rad = Math.pow(dataArray[0] + 100, 3/2); 
+        const rad = Math.pow(dataArray[Q] + 100, 3/2); 
         GLOBE_RADIUS = rad < 0 ? 40 : rad;
         
        
@@ -220,7 +228,7 @@ class Particle {
 
 }
 
-let density = 800;
+let density = 1600;
 function render() {
     ctx.clearRect(0, 0, width, height);
     if (!particles.length) {
