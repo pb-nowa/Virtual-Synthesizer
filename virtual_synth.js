@@ -57,6 +57,8 @@ window.onload = () => {
 
     async function initBuffer() {
         buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
+        Array.prototype.reverse.call(buffer.getChannelData(0));
+        Array.prototype.reverse.call(buffer.getChannelData(1));
         console.log('loaded');
     }
 
@@ -157,6 +159,7 @@ const PARTICLE_RADIUS = 4;
 // let GLOBE_RADIUS = width / 3;
 let GLOBE_RADIUS = 40;
 let particles = [];
+
 class Particle {
     constructor(analyser, theta, phi, x, y, z) {
         this.analyser = analyser;
@@ -253,7 +256,6 @@ function render() {
     }
 
     window.requestAnimationFrame(render);
-
 }
 
 function init() {
