@@ -3,10 +3,12 @@ import { getBuffer } from './get_buffer';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let playing = false;
+
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
 const reverbBus = c.createGain();
+let rad = 2;
 let Q = 12;
 
 const delay = new DelayNode(c, {
@@ -70,7 +72,7 @@ window.onload = () => {
             source.start(c.currentTime, 6);
             const bus = c.createGain();
             source.connect(bus);
-            bus.gain.linearRampToValueAtTime(-20, c.currentTime + 3);
+            bus.gain.linearRampToValueAtTime(3, c.currentTime + 3);
             bus.connect(masterbus);
 
             console.log('playing');
@@ -85,42 +87,34 @@ window.onload = () => {
         }
     });
 
-    canvas.addEventListener('mousemove', (e) => {
-        console.log(e.x, e.y);
-        if (e.y < 400){
-            playGrains();
-            window.setTimeout(playGrains, Math.random() * 275);
-        } else  {
-
-        }
-    });
-
     const grains = [];
     let grainCount = 0;
 
-    const playGrains = () => {
+    function playGrains() {
         const grain = new Grain(c, buffer, reverbBus);
         grains[grainCount] = grain;
         grainCount += 1;
-    };
-
-    // canvas.addEventListener('click', function() {
-    //         play();
-    //         console.log('clicked');
-    // });
-
-    const changeVolume = (ele, node) => {
-        const volume = ele.value;
-        const fraction = parseInt(volume) / 100;
-        node.gain.value = fraction * fraction;
-    };
+    }
+ 
+    canvas.addEventListener('mousemove', (e) => {
+        if (e.y < (height / 2) + rad  &&
+            e.y > (height / 2) - rad &&
+            e.x < (width / 2) + rad &&
+            e.x > (width / 2) - rad
+        ){           
+            playGrains();
+            window.setTimeout(playGrains, Math.random() * 275);
+            masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
+        } else {
+            masterbus.gain.linearRampToValueAtTime(3, c.currentTime + 0.5);
+        }
+    });
 };
 
 const canvas = document.getElementById("sphere");
 
 let width = canvas.offsetWidth;
 let height = canvas.offsetHeight;
-
 
 const ctx = canvas.getContext('2d');
 
@@ -141,6 +135,7 @@ function onResize() {
 
 window.addEventListener('resize', onResize);
 onResize();
+
 
 let PERSPECTIVE = width * 0.7;
 let PROJECTION_CENTER_X = width / 2;
@@ -178,8 +173,8 @@ class Particle {
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
 
-        const rad = Math.pow(dataArray[12] + 75, 3/2); 
-        GLOBE_RADIUS = rad < 0 ? 40 : rad;
+        rad = Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2); 
+        GLOBE_RADIUS = rad;
         
        
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);

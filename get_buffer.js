@@ -4,4 +4,3 @@ export const getBuffer = (ctx, impulseURL) => {
     .then( arrayBuffer => ctx.decodeAudioData(arrayBuffer)
     );
 };
-
