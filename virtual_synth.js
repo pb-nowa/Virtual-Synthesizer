@@ -1,31 +1,29 @@
 import Grain from './grain.js';
-import Reverb from './reverb.js';
+// import Reverb from './reverb.js';
+import { getImpulseBuffer } from './impulse';
 // import { request } from './request.js';
 // import Particle from './particle.js';
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-export const c = new AudioContext();
-export const master = c.createGain();
-export const masterbus = c.createGain();
+const c = new AudioContext();
+const master = c.createGain();
+const masterbus = c.createGain();
 
-export const delay = new DelayNode(c, {
+const delay = new DelayNode(c, {
     delayTime: 0.4,
     maxDelayTime: 0.4,
 });
 
-export const hipass = new BiquadFilterNode(c, {
+const hipass = new BiquadFilterNode(c, {
     type: 'highpass',
     frequency: 0,
 });
 
-export const lopass = new BiquadFilterNode(c, {
+const lopass = new BiquadFilterNode(c, {
     type: 'lowpass',
     frequency: 10000,
 });
-
-export const convolver = c.createConvolver();
-let source, hallBuffer;
 
 let lfo = new OscillatorNode(c, {
     type: 'sine',
@@ -39,44 +37,28 @@ const analyser = new AnalyserNode(c, {
     smoothingTimeConstant: 0.97
 });
 
-const reverb = new Reverb(c, { 
-    roomSize: 0.9, 
-    dampening: 3000, 
-    wetGain: 0.8, 
-    dryGain: 0.2 
-});
+// const reverb = new Reverb(c, { 
+//     roomSize: 0.9, 
+//     dampening: 3000, 
+//     wetGain: 0.8, 
+//     dryGain: 0.2 
+// });
+let convolver;
 
-// const analyser = c.createAnalyser();
+async function setReverb() {
+    convolver = c.createConvolver();
+    convolver.buffer = await getImpulseBuffer(c, '/assets/audio/large_hall.wav');
+    masterbus.connect(convolver).connect(c.destination);
+}
 
-const request = new XMLHttpRequest();
-request.open('GET', 'assets/audio/large_hall.wav', true);
-request.responseType = "arraybuffer";
-request.onload = function () {
-    c.decodeAudioData(request.response, function (buffer) {
-        hallBuffer = buffer;
-        source = c.createBufferSource();
-        source.buffer = hallBuffer;
-        console.log('convolver loaded');
-    }, function (e) {
-        console.log('loading failed' + e.err);
-    });
-};
-request.send();
-
-convolver.buffer = hallBuffer;
-
-masterbus.connect(convolver);
 masterbus.connect(master);
-masterbus.connect(reverb);
-reverb.connect(master);
-// convolver.connect(master);
+// masterbus.connect(reverb);
+// reverb.connect(master);
 
-// master.connect(c.destination);
 lfo.connect(master.gain);
 lfo.start();
 master.connect(analyser);
 analyser.connect(c.destination);
-// delay.connect(c.destination);
 
 window.onload = () => {
     let buffer, source, data;
@@ -114,7 +96,7 @@ window.onload = () => {
     let grainCount = 0;
 
     const play = () => {
-        const grain = new Grain(buffer);
+        const grain = new Grain(c, buffer, masterbus);
         grains[grainCount] = grain;
         grainCount += 1;
         window.setTimeout(play, Math.random() * 275);

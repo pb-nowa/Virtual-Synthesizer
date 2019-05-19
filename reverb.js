@@ -112,10 +112,10 @@ class Reverb extends CompositeAudioNode {
         this.input.connect(this.dry).connect(this.output);
 
         combLeft.forEach(comb => {
-            this.splitter.connect(comb.input, 0).connect(this.merger, 0, 0)
+            this.splitter.connect(comb.input, 0).connect(this.merger, 0, 0);
         });
         combRight.forEach(comb => {
-            this.splitter.connect(comb.input, 1).connect(this.merger, 0, 1)
+            this.splitter.connect(comb.input, 1).connect(this.merger, 0, 1);
         });
 
         this.merger.connect(this.allPassFilters[0])
