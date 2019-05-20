@@ -138,7 +138,7 @@ window.addEventListener('resize', onResize);
 onResize();
 
 
-let PERSPECTIVE = width * 0.7;
+let PERSPECTIVE = width * 0.8;
 let PROJECTION_CENTER_X = width / 2;
 let PROJECTION_CENTER_Y = height / 2;
 const PARTICLE_RADIUS = 1.6;
@@ -161,26 +161,25 @@ class Particle {
         this.xProjected = x || 0; 
         this.yProjected = y || 0;
         this.scaleProjected = z || 0;
-        this.rad = rad || 2; 
+        this.rad = rad || 0; 
 
     }
 
-    // Projection translation from 2d to 3d from:
-    // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
     project() {
         const timeFrequencyData = new Uint8Array(this.analyser.fftSize);
         const timeFloatData = new Float32Array(this.analyser.fftSize);
         const dataArray = new Float32Array(this.analyser.frequencyBinCount);
-
+        
         this.analyser.getByteTimeDomainData(timeFrequencyData);
         this.analyser.getFloatTimeDomainData(timeFloatData);
         this.analyser.getFloatFrequencyData(dataArray);
-
-        this.rad = Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2); 
-        rad = Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3 / 2);
+        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2)); 
+        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3 / 2));
         GLOBE_RADIUS = this.rad;
         
-       
+        
+        // Projection translation from 2d to 3d from:
+        // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
         this.x = GLOBE_RADIUS * Math.sin(this.phi) * Math.cos(this.theta);
         this.y = GLOBE_RADIUS * Math.cos(this.phi);
         this.z = GLOBE_RADIUS * Math.sin(this.phi) * Math.sin(this.theta) + GLOBE_RADIUS;
@@ -209,7 +208,7 @@ class Particle {
 
 }
 
-let density = 1600;
+let density = loaded ? 1600 : 30;
 
 const play = new Image();
 play.src = "./assets/images/play_icon_hero.png";
@@ -226,10 +225,12 @@ function draw(ctx, img, x, y, w, h){
         ctx.drawImage(img, x, y, w, h);
     }
 }
+let saveRad = 1300;
 
 function render(ctx) {
     ctx.clearRect(0, 0, width, height);
 
+    let loadRad = 1300;
     //play and pause button
     if (playing) {
         draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
@@ -239,7 +240,7 @@ function render(ctx) {
     
     if (!particles.length) {
         for (let i = 0; i < density; i++) {
-            particles.push(new Particle({analyser}));
+            particles.push(new Particle({ analyser, rad: 2}));
         }
     } else {
         const preParticles = Array.from(particles);
@@ -255,6 +256,30 @@ function render(ctx) {
             }));
         }  
     }
+
+    //load screen
+    // if (!particles.length) {
+    //     for (let i = 0; i < density; i++) {
+    //         particles.push(new Particle({ analyser, rad: loadRad }));
+    //     }
+    // } else {
+    //     const preParticles = Array.from(particles);
+    //     particles = [];
+    //     const zoomSpeed = 25;
+    //     saveRad = (saveRad <= 0) ? loadRad : saveRad - zoomSpeed;
+        
+    //     for (let i = 0; i < density; i++) {
+    //         particles.push(new Particle({
+    //             analyser: analyser, 
+    //             rad: saveRad,
+    //             theta: preParticles[i].theta,
+    //             phi: preParticles[i].phi,
+    //             x: preParticles[i].x, 
+    //             y: preParticles[i].y, 
+    //             z: preParticles[i].z
+    //         }));
+    //     }  
+    // }
 
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
