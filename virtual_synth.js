@@ -117,13 +117,8 @@ window.onload = () => {
         }
     });
 
-    const grains = [];
-    let grainCount = 0;
-
     function playGrains() {
-        const grain = new Grain(c, buffer, reverbBus);
-        grains[grainCount] = grain;
-        grainCount += 1;
+        const grain = new Grain(c, buffer, reverbBus, timer);
     }
 
  

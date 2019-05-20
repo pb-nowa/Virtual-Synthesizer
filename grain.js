@@ -1,5 +1,5 @@
 class Grain {
-    constructor(c, buffer, masterbus) {
+    constructor(c, buffer, masterbus, startTime) {
         this.context = c;
         this.now = this.context.currentTime;
         this.source = this.context.createBufferSource();
@@ -14,11 +14,11 @@ class Grain {
         this.bus.connect(masterbus);
         // this.bus.connect(convolver);
 
-        this.playGrain();
+        this.playGrain(startTime);
     }
 
     playGrain(startTime) {
-        this.source.start(this.now, Math.random() * 0.5 + this.playbackSampleStart, this.attack + this.sustain + this.release);
+        this.source.start(startTime, Math.random() * 0.5 + this.playbackSampleStart, this.attack + this.sustain + this.release);
         this.bus.gain.setValueAtTime(0, this.now);
         // value, endtime
         this.bus.gain.linearRampToValueAtTime(4, this.now + this.attack);
