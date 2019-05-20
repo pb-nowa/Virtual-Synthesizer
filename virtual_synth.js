@@ -90,14 +90,14 @@ window.onload = () => {
     initBuffer();
     
     canvas.addEventListener('click', function(){
+        const bus = c.createGain();
         if (!playing){
             source = c.createBufferSource();
             source.buffer = buffer;
             source.start(c.currentTime, timer);
-            const bus = c.createGain();
             source.connect(bus);
             console.log(timer);
-            bus.gain.linearRampToValueAtTime(timer, c.currentTime + 3);
+            bus.gain.linearRampToValueAtTime(1.5, c.currentTime + 3);
             bus.connect(masterbus);
 
             console.log('playing');
@@ -109,7 +109,8 @@ window.onload = () => {
                 timer++;
             }, 1000);
         } else {
-            source.stop(c.currentTime);
+            bus.gain.linearRampToValueAtTime(0, c.currentTime + 0.5);
+            source.stop(c.currentTime + 0.5);
             console.log('stopped');
             playing = false;
             window.clearInterval(timerId);
@@ -139,7 +140,7 @@ window.onload = () => {
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
         } else {
-            masterbus.gain.linearRampToValueAtTime(3, c.currentTime + 0.5);
+            masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
         }
     });
 
@@ -202,8 +203,8 @@ class Particle {
         const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
         this.analyser.getFloatFrequencyData(dataArray);
 
-        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2)); 
-        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3 / 2));
+        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
+        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
         GLOBE_RADIUS = this.rad;
         
         // Projection translation from 2d to 3d from:
