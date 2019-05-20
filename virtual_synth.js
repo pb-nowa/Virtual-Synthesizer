@@ -208,7 +208,7 @@ class Particle {
 
 }
 
-let density = loaded ? 1600 : 30;
+let density = 30;
 
 const play = new Image();
 play.src = "./assets/images/play_icon_hero.png";
@@ -249,53 +249,55 @@ function render(ctx) {
         }
     }
     
-    // if (!particles.length) {
-    //     for (let i = 0; i < density; i++) {
-    //         particles.push(new Particle({ analyser, rad: 2}));
-    //     }
-    // } else {
-    //     const preParticles = Array.from(particles);
-    //     particles = [];
-    //     for (let i = 0; i < density; i++) {
-    //         particles.push(new Particle({
-    //             analyser: analyser, 
-    //             theta: preParticles[i].theta,
-    //             phi: preParticles[i].phi,
-    //             x: preParticles[i].x, 
-    //             y: preParticles[i].y, 
-    //             z: preParticles[i].z
-    //         }));
-    //     }  
-    // }
-
-    // load screen
-    if (!loadParticles[0].particles.length) {
-        for (let j = 0; j  < loadParticles.length; j++) {
+    if (loaded){
+        density = 1300;
+        if (!particles.length) {
             for (let i = 0; i < density; i++) {
-                loadParticles[j].particles.push(new Particle({ analyser, rad: loadParticles[j].saveRad }));
-            } 
-        }
-    } else {
-        for (let j = 0; j < loadParticles.length; j++) {
-            const preParticles = Array.from(loadParticles[j].particles);
-            loadParticles[j].particles = [];
-            const zoomSpeed = 25;
-            loadParticles[j].saveRad = (loadParticles[j].saveRad <= 0) ? loadRad : loadParticles[j].saveRad - zoomSpeed;
-            
+                particles.push(new Particle({ analyser, rad: 2}));
+            }
+        } else {
+            const preParticles = Array.from(particles);
+            particles = [];
             for (let i = 0; i < density; i++) {
-                loadParticles[j].particles.push(new Particle({
+                particles.push(new Particle({
                     analyser: analyser, 
-                    rad: loadParticles[j].saveRad,
                     theta: preParticles[i].theta,
                     phi: preParticles[i].phi,
                     x: preParticles[i].x, 
                     y: preParticles[i].y, 
                     z: preParticles[i].z
                 }));
+            }  
+        }
+    } else {
+    // load screen
+        if (!loadParticles[0].particles.length) {
+            for (let j = 0; j  < loadParticles.length; j++) {
+                for (let i = 0; i < density; i++) {
+                    loadParticles[j].particles.push(new Particle({ analyser, rad: loadParticles[j].saveRad }));
+                } 
+            }
+        } else {
+            for (let j = 0; j < loadParticles.length; j++) {
+                const preParticles = Array.from(loadParticles[j].particles);
+                loadParticles[j].particles = [];
+                const zoomSpeed = 25;
+                loadParticles[j].saveRad = (loadParticles[j].saveRad <= 0) ? loadRad : loadParticles[j].saveRad - zoomSpeed;
+                
+                for (let i = 0; i < density; i++) {
+                    loadParticles[j].particles.push(new Particle({
+                        analyser: analyser, 
+                        rad: loadParticles[j].saveRad,
+                        theta: preParticles[i].theta,
+                        phi: preParticles[i].phi,
+                        x: preParticles[i].x, 
+                        y: preParticles[i].y, 
+                        z: preParticles[i].z
+                    }));
+                } 
             } 
-        } 
+        }
     }
-
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
     }
@@ -304,6 +306,7 @@ function render(ctx) {
     particles.sort((dot1, dot2) => {
         return dot1.sizeProjection - dot2.sizeProjection;
     });
+
     if (!loaded) {
         for (let j = 0; j < loadParticles.length; j++) {
             for (let i = 0; i < loadParticles[j].particles.length; i++){
