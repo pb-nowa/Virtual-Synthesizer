@@ -4,6 +4,9 @@ import { getBuffer } from './get_buffer';
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let playing = false;
 let loaded = false;
+let timer = 1;
+let timerId;
+
 const c = new AudioContext();
 const master = c.createGain();
 const masterbus = c.createGain();
@@ -82,7 +85,6 @@ window.onload = () => {
         xorSwapHalf(revBuffer.getChannelData(1));
 
         loaded = true;
-        console.log(loaded);
     }
 
     initBuffer();
@@ -91,10 +93,11 @@ window.onload = () => {
         if (!playing){
             source = c.createBufferSource();
             source.buffer = buffer;
-            source.start(c.currentTime, 6);
+            source.start(c.currentTime, timer);
             const bus = c.createGain();
             source.connect(bus);
-            bus.gain.linearRampToValueAtTime(3, c.currentTime + 3);
+            console.log(timer);
+            bus.gain.linearRampToValueAtTime(timer, c.currentTime + 3);
             bus.connect(masterbus);
 
             console.log('playing');
@@ -102,10 +105,14 @@ window.onload = () => {
                 console.log("file has ended");
             };
             playing = true;
+            timerId = window.setInterval(() => {
+                timer++;
+            }, 1000);
         } else {
             source.stop(c.currentTime);
             console.log('stopped');
             playing = false;
+            window.clearInterval(timerId);
         }
     });
 
@@ -117,13 +124,17 @@ window.onload = () => {
         grains[grainCount] = grain;
         grainCount += 1;
     }
+
  
     canvas.addEventListener('mousemove', (e) => {
-        if (e.y < (height / 2) + rad  &&
-            e.y > (height / 2) - rad &&
-            e.x < (width / 2) + rad &&
-            e.x > (width / 2) - rad
-        ){           
+        const radius = 200;
+        if (loaded && 
+            playing &&
+            e.y < (height / 2) + radius - 30 &&
+            e.y > (height / 2) - radius + 30 &&
+            e.x < (width / 2) + radius - 30 &&
+            e.x > (width / 2) - radius + 30
+            ){           
             playGrains();
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
@@ -131,6 +142,7 @@ window.onload = () => {
             masterbus.gain.linearRampToValueAtTime(3, c.currentTime + 0.5);
         }
     });
+
 };
 
 const canvas = document.getElementById("sphere");

@@ -17,11 +17,11 @@ class Grain {
         this.playGrain();
     }
 
-    playGrain() {
+    playGrain(startTime) {
         this.source.start(this.now, Math.random() * 0.5 + this.playbackSampleStart, this.attack + this.sustain + this.release);
         this.bus.gain.setValueAtTime(0, this.now);
         // value, endtime
-        this.bus.gain.linearRampToValueAtTime(110, this.now + this.attack);
+        this.bus.gain.linearRampToValueAtTime(15, this.now + this.attack);
         this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.sustain + this.release - 0.01);
     }
 }
