@@ -1,5 +1,5 @@
 class Grain {
-    constructor(c, buffer, masterbus, startTime) {
+    constructor(c, buffer, reverbBus, startTime) {
         this.context = c;
         this.now = this.context.currentTime;
         this.source = this.context.createBufferSource();
@@ -10,8 +10,11 @@ class Grain {
         this.playbackSampleStart = startTime; //where in the audio file to start playing
 
         this.bus = this.context.createGain();
-        this.source.connect(this.bus);
-        this.bus.connect(masterbus);
+        // this.source.connect(this.bus);
+        this.source.connect(reverbBus);
+        this.bus.gain.setValueAtTime(1, this.now);
+        this.bus.connect(this.context.destination);
+
         // this.bus.connect(convolver);
 
         this.playGrain();

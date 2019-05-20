@@ -6,6 +6,8 @@ let playing = false;
 let loaded = false;
 let timer = 1;
 let timerId;
+let source;
+let buffer;
 
 const c = new AudioContext();
 const master = c.createGain();
@@ -73,7 +75,7 @@ function xorSwapHalf(array) {
 }
 
 window.onload = () => {
-    let buffer, revBuffer, source;
+    let revBuffer;
 
     async function initBuffer() {
         buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
@@ -96,14 +98,8 @@ window.onload = () => {
             source.buffer = buffer;
             source.start(c.currentTime, timer);
             source.connect(bus);
-            console.log(timer);
             bus.gain.linearRampToValueAtTime(1.5, c.currentTime + 3);
             bus.connect(masterbus);
-
-            console.log('playing');
-            source.onended = () => {
-                console.log("file has ended");
-            };
             playing = true;
             timerId = window.setInterval(() => {
                 timer++;
@@ -116,6 +112,20 @@ window.onload = () => {
             window.clearInterval(timerId);
         }
     });
+
+    function setStart(){
+        const bus = c.createGain();
+        source = c.createBufferSource();
+        source.buffer = buffer;
+        source.start(c.currentTime, timer);
+        source.connect(bus);
+        bus.gain.linearRampToValueAtTime(1.5, c.currentTime + 1);
+        bus.connect(masterbus);
+        playing = true;
+        timerId = window.setInterval(() => {
+            timer++;
+        }, 1000);
+    }
 
     function playGrains() {
         const grain = new Grain(c, buffer, reverbBus, timer);
@@ -130,12 +140,15 @@ window.onload = () => {
             e.y > (height / 2) - radius + 30 &&
             e.x < (width / 2) + radius - 30 &&
             e.x > (width / 2) - radius + 30
-            ){           
+            ){          
+            // source.stop(c.currentTime + 1); 
+            // window.clearInterval(timerId);
             playGrains();
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
         } else {
             masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
+            // setStart();
         }
     });
 
