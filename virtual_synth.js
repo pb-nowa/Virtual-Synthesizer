@@ -40,6 +40,7 @@ async function setReverb() {
     convolver = c.createConvolver();
     convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
     reverbBus.connect(convolver).connect(bandpass).connect(master);
+    console.log('reverb loaded');
 }
 
 setReverb();
@@ -50,7 +51,23 @@ lfo.connect(master.gain);
 master.connect(analyser);
 master.connect(c.destination);
 
-
+//https://stackoverflow.com/questions/5276953/what-is-the-most-efficient-way-to-reverse-an-array-in-javascript
+function xorSwapHalf(array) {
+    var i = null;
+    var r = null;
+    var length = array.length;
+    for (i = 0; i < length / 2; i += 1) {
+        r = length - 1 - i;
+        var left = array[i];
+        var right = array[r];
+        left ^= right;
+        right ^= left;
+        left ^= right;
+        array[i] = left;
+        array[r] = right;
+    }
+    return array;
+}
 
 window.onload = () => {
     let buffer, revBuffer, source;
@@ -58,8 +75,12 @@ window.onload = () => {
     async function initBuffer() {
         buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
         revBuffer = await getBuffer(c, '/assets/audio/reverie.mp3');
-        Array.prototype.reverse.call(revBuffer.getChannelData(0));
-        Array.prototype.reverse.call(revBuffer.getChannelData(1));
+        // Array.prototype.reverse.call(revBuffer.getChannelData(0));
+        // Array.prototype.reverse.call(revBuffer.getChannelData(1));
+        // xor swap algorithm used for reversing the array for efficiency while rendering Canvas load screen
+        xorSwapHalf(revBuffer.getChannelData(0));
+        xorSwapHalf(revBuffer.getChannelData(1));
+
         loaded = true;
         console.log(loaded);
     }
@@ -166,17 +187,12 @@ class Particle {
     }
 
     project() {
-        const timeFrequencyData = new Uint8Array(this.analyser.fftSize);
-        const timeFloatData = new Float32Array(this.analyser.fftSize);
-        const dataArray = new Float32Array(this.analyser.frequencyBinCount);
-        
-        this.analyser.getByteTimeDomainData(timeFrequencyData);
-        this.analyser.getFloatTimeDomainData(timeFloatData);
+        const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
         this.analyser.getFloatFrequencyData(dataArray);
+
         this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3/2)); 
         rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 3 / 2));
         GLOBE_RADIUS = this.rad;
-        
         
         // Projection translation from 2d to 3d from:
         // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
