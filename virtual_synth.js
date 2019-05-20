@@ -225,53 +225,40 @@ function draw(ctx, img, x, y, w, h){
         ctx.drawImage(img, x, y, w, h);
     }
 }
-let saveRad = 1300;
+
+let loadParticles = [ 
+    { idx: 1, saveRad: 1200, particles: [] },
+    { idx: 2, saveRad: 900, particles: [] },
+    { idx: 3, saveRad: 600, particles: [] },
+    { idx: 4, saveRad: 300, particles: [] }
+];
+
+let loadIdx = 0;
+let saveRad = 1200;
 
 function render(ctx) {
     ctx.clearRect(0, 0, width, height);
 
-    let loadRad = 1300;
+    let loadRad = 1200;
     //play and pause button
-    if (playing) {
-        draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
-    } else {
-        draw(ctx, play, width / 2 - 75, height - 130, 150, 100);
+    if (loaded) {
+        if (playing) {
+            draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
+        } else {
+            draw(ctx, play, width / 2 - 75, height - 130, 150, 100);
+        }
     }
     
-    if (!particles.length) {
-        for (let i = 0; i < density; i++) {
-            particles.push(new Particle({ analyser, rad: 2}));
-        }
-    } else {
-        const preParticles = Array.from(particles);
-        particles = [];
-        for (let i = 0; i < density; i++) {
-            particles.push(new Particle({
-                analyser: analyser, 
-                theta: preParticles[i].theta,
-                phi: preParticles[i].phi,
-                x: preParticles[i].x, 
-                y: preParticles[i].y, 
-                z: preParticles[i].z
-            }));
-        }  
-    }
-
-    //load screen
     // if (!particles.length) {
     //     for (let i = 0; i < density; i++) {
-    //         particles.push(new Particle({ analyser, rad: loadRad }));
+    //         particles.push(new Particle({ analyser, rad: 2}));
     //     }
     // } else {
     //     const preParticles = Array.from(particles);
     //     particles = [];
-    //     const zoomSpeed = 25;
-    //     saveRad = (saveRad <= 0) ? loadRad : saveRad - zoomSpeed;
-        
     //     for (let i = 0; i < density; i++) {
     //         particles.push(new Particle({
     //             analyser: analyser, 
-    //             rad: saveRad,
     //             theta: preParticles[i].theta,
     //             phi: preParticles[i].phi,
     //             x: preParticles[i].x, 
@@ -281,6 +268,34 @@ function render(ctx) {
     //     }  
     // }
 
+    // load screen
+    if (!loadParticles[0].particles.length) {
+        for (let j = 0; j  < loadParticles.length; j++) {
+            for (let i = 0; i < density; i++) {
+                loadParticles[j].particles.push(new Particle({ analyser, rad: loadParticles[j].saveRad }));
+            } 
+        }
+    } else {
+        for (let j = 0; j < loadParticles.length; j++) {
+            const preParticles = Array.from(loadParticles[j].particles);
+            loadParticles[j].particles = [];
+            const zoomSpeed = 25;
+            loadParticles[j].saveRad = (loadParticles[j].saveRad <= 0) ? loadRad : loadParticles[j].saveRad - zoomSpeed;
+            
+            for (let i = 0; i < density; i++) {
+                loadParticles[j].particles.push(new Particle({
+                    analyser: analyser, 
+                    rad: loadParticles[j].saveRad,
+                    theta: preParticles[i].theta,
+                    phi: preParticles[i].phi,
+                    x: preParticles[i].x, 
+                    y: preParticles[i].y, 
+                    z: preParticles[i].z
+                }));
+            } 
+        } 
+    }
+
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
     }
@@ -289,9 +304,16 @@ function render(ctx) {
     particles.sort((dot1, dot2) => {
         return dot1.sizeProjection - dot2.sizeProjection;
     });
-
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].draw();
+    if (!loaded) {
+        for (let j = 0; j < loadParticles.length; j++) {
+            for (let i = 0; i < loadParticles[j].particles.length; i++){
+                loadParticles[j].particles[i].draw();
+            }
+        }
+    } else {
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].draw();
+        }
     }
 
     window.requestAnimationFrame(() => render(ctx));
