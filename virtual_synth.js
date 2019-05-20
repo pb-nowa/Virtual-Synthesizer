@@ -8,6 +8,11 @@ let timer = 1;
 let timerId;
 let source;
 let buffer;
+let mouse = {
+    x: null,
+    y: null
+};
+let inside = false;
 
 const c = new AudioContext();
 const master = c.createGain();
@@ -98,7 +103,7 @@ window.onload = () => {
             source.buffer = buffer;
             source.start(c.currentTime, timer);
             source.connect(bus);
-            bus.gain.linearRampToValueAtTime(1.5, c.currentTime + 3);
+            bus.gain.linearRampToValueAtTime(1.2, c.currentTime + 3);
             bus.connect(masterbus);
             playing = true;
             timerId = window.setInterval(() => {
@@ -119,7 +124,7 @@ window.onload = () => {
         source.buffer = buffer;
         source.start(c.currentTime, timer);
         source.connect(bus);
-        bus.gain.linearRampToValueAtTime(1.5, c.currentTime + 1);
+        bus.gain.linearRampToValueAtTime(1.2, c.currentTime + 1);
         bus.connect(masterbus);
         playing = true;
         timerId = window.setInterval(() => {
@@ -134,6 +139,8 @@ window.onload = () => {
  
     canvas.addEventListener('mousemove', (e) => {
         const radius = 200;
+        mouse.x = e.x;
+        mouse.y = e.y;
         if (loaded && 
             playing &&
             e.y < (height / 2) + radius - 30 &&
@@ -161,6 +168,23 @@ let height = canvas.offsetHeight;
 
 const ctx = canvas.getContext('2d');
 
+function playGrains() {
+    const grain = new Grain(c, buffer, reverbBus, timer);
+}
+
+let isGranulating = false;
+// function granulate(){
+//     if (loaded && inside && !isGranulating){          
+//         isGranulating = true;
+//         playGrains();
+//         window.setTimeout(playGrains, Math.random() * 275);
+//         masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
+//     } else if (!inside){
+//         isGranulating = false;
+//         masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
+//     } 
+// }
+
 function onResize() {
     width = canvas.offsetWidth;
     height = canvas.offsetHeight;
@@ -187,6 +211,7 @@ const PARTICLE_RADIUS = 1.6;
 // let GLOBE_RADIUS = width / 3;
 let GLOBE_RADIUS = 40;
 let particles = [];
+let repulsedParticles = [];
 
 class Particle {
     constructor({analyser, theta, phi, x, y, z, rad}) {
@@ -234,6 +259,7 @@ class Particle {
         ctx.beginPath();
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+
         const r = 70;
         const g = 255;
         const b = 140;
@@ -288,22 +314,41 @@ function render(ctx) {
     
     if (loaded){
         density = 1300;
-        if (!particles.length) {
+        if (particles.length < 1000) {
+            inside = false;
+            particles = [];
             for (let i = 0; i < density; i++) {
-                particles.push(new Particle({ analyser, rad: 2}));
+                particles.push(new Particle({ analyser }));
             }
         } else {
             const preParticles = Array.from(particles);
             particles = [];
-            for (let i = 0; i < density; i++) {
-                particles.push(new Particle({
-                    analyser: analyser, 
-                    theta: preParticles[i].theta,
-                    phi: preParticles[i].phi,
-                    x: preParticles[i].x, 
-                    y: preParticles[i].y, 
-                    z: preParticles[i].z
-                }));
+            for (let i = 0; i < preParticles.length; i++) {
+                if (mouse.x - preParticles[i].xProjected < 10 &&
+                    mouse.x - preParticles[i].xProjected > -10 &&
+                    mouse.y - preParticles[i].yProjected < 10 &&
+                    mouse.y - preParticles[i].yProjected > -10) {
+                    inside = true;
+                    repulsedParticles.push(new Particle({
+                        analyser: analyser,
+                        theta: preParticles[i].theta,
+                        phi: preParticles[i].phi,
+                        x: preParticles[i].x,
+                        y: preParticles[i].y,
+                        z: preParticles[i].z
+                    }));
+                } else {
+                    const rad = inside ? preParticles[i].rad : 0; 
+                    particles.push(new Particle({
+                        analyser: analyser, 
+                        theta: preParticles[i].theta,
+                        phi: preParticles[i].phi,
+                        x: preParticles[i].x, 
+                        y: preParticles[i].y, 
+                        z: preParticles[i].z,
+                        rad
+                    }));
+                }
             }  
         }
     } else {
@@ -356,6 +401,7 @@ function render(ctx) {
         }
     }
 
+    // granulate();
     window.requestAnimationFrame(() => render(ctx));
 }
 
