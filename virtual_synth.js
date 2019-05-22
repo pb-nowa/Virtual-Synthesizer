@@ -50,7 +50,6 @@ async function setReverb() {
     convolver = c.createConvolver();
     convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
     reverbBus.connect(convolver).connect(bandpass).connect(master);
-    console.log('reverb loaded');
 }
 
 setReverb();
@@ -59,25 +58,7 @@ masterbus.connect(master);
 lfo.connect(master.gain);
 // lfo.start();
 master.connect(analyser);
-master.connect(c.destination);
-
-//https://stackoverflow.com/questions/5276953/what-is-the-most-efficient-way-to-reverse-an-array-in-javascript
-function xorSwapHalf(array) {
-    var i = null;
-    var r = null;
-    var length = array.length;
-    for (i = 0; i < length / 2; i += 1) {
-        r = length - 1 - i;
-        var left = array[i];
-        var right = array[r];
-        left ^= right;
-        right ^= left;
-        left ^= right;
-        array[i] = left;
-        array[r] = right;
-    }
-    return array;
-}
+analyser.connect(c.destination);
 
 window.onload = () => {
     let revBuffer;
@@ -85,12 +66,8 @@ window.onload = () => {
     async function initBuffer() {
         buffer = await getBuffer(c, '/assets/audio/reverie.mp3'); 
         revBuffer = await getBuffer(c, '/assets/audio/reverie.mp3');
-        // Array.prototype.reverse.call(revBuffer.getChannelData(0));
-        // Array.prototype.reverse.call(revBuffer.getChannelData(1));
-        // xor swap algorithm used for reversing the array for efficiency while rendering Canvas load screen
-        xorSwapHalf(revBuffer.getChannelData(0));
-        xorSwapHalf(revBuffer.getChannelData(1));
-
+        Array.prototype.reverse.call(revBuffer.getChannelData(0));
+        Array.prototype.reverse.call(revBuffer.getChannelData(1));
         loaded = true;
     }
 
@@ -112,7 +89,6 @@ window.onload = () => {
         } else {
             bus.gain.linearRampToValueAtTime(0, c.currentTime + 0.5);
             source.stop(c.currentTime + 0.5);
-            console.log('stopped');
             playing = false;
             window.clearInterval(timerId);
         }
@@ -133,7 +109,7 @@ window.onload = () => {
     }
 
     function playGrains() {
-        const grain = new Grain(c, buffer, reverbBus, timer);
+        const grain = new Grain(c, revBuffer, reverbBus, timer);
     }
 
  
@@ -348,6 +324,10 @@ function render(ctx) {
                     mouse.y - preParticles[i].yProjected < 10 &&
                     mouse.y - preParticles[i].yProjected > -10) {
                     inside = true;
+                    if (repulsedParticles.length > 900){
+                        //garbage collection
+                        repulsedParticles.shift();
+                    }    
                     repulsedParticles.push(new Particle({
                         analyser: analyser,
                         theta: preParticles[i].theta,
