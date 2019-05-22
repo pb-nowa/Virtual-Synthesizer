@@ -42,6 +42,13 @@ In order to create a 3D effect on a 2d canvas, an algorith is used to convert th
         this.xProjected = (this.x * this.scaleProjected) + PROJECTION_CENTER_X;
         this.yProjected = (this.y * this.scaleProjected) + PROJECTION_CENTER_Y;
     }
+    
+    //rotates all particles in the orb
+    rotate() {
+        this.theta = this.z < 0 ? this.theta + 0.03 : this.theta - 0.03;
+        this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002) ;
+    }
+  
   }
 
 ```
@@ -74,12 +81,7 @@ The orb reacts to the current audio source. Through the audio analysis node, the
         
         ...
     }
-        //rotates all particles in the orb
-    rotate() {
-        this.theta = this.z < 0 ? this.theta + 0.03 : this.theta - 0.03;
-        this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002) ;
-    }
-        
+    
     //this is called instead of Particle.prototype.rotate() if the mouse comes in contact with that particle
     deflect() {
         this.theta = this.theta + 0.04;
