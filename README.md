@@ -29,8 +29,6 @@ In order to create a 3D effect on a 2d canvas, an algorith is used to convert th
     
     //this function is called anytime a particle is rendered. 
     project() {
-        //creates and array of data from the current audio. 
-        
         ...
         
         GLOBE_RADIUS = this.rad;
