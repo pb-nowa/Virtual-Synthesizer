@@ -7,7 +7,7 @@ class Grain {
         this.attack = Math.random() * 0.3;
         this.sustain = Math.random() * 0.2;
         this.release = Math.random() * 0.05;
-        this.playbackSampleStart = startTime; //where in the audio file to start playing
+        this.playbackSampleStart = startTime; 
 
         this.bus = this.context.createGain();
         // this.source.connect(this.bus);
