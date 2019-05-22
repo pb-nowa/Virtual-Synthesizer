@@ -74,6 +74,26 @@ The orb reacts to the current audio source. Through the audio analysis node, the
         
         ...
     }
+        //rotates all particles in the orb
+    rotate() {
+        this.theta = this.z < 0 ? this.theta + 0.03 : this.theta - 0.03;
+        this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002) ;
+    }
+        
+    //this is called instead of Particle.prototype.rotate() if the mouse comes in contact with that particle
+    deflect() {
+        this.theta = this.theta + 0.04;
+        this.rad = this.rad + 8;
+        this.project();
+
+        ctx.globalAlpha = Math.abs(1 - this.z / width);
+
+        ctx.beginPath();
+        ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+
+        ctx.fillStyle = 'rgb(0, 212, 212)';
+        ctx.fill();
+    }
   }
 
 ```
