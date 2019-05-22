@@ -236,9 +236,10 @@ class Particle {
         const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
         this.analyser.getFloatFrequencyData(dataArray);
 
-        this.rad = 200;//this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
-        rad = 200; //this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
+        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
+        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
         GLOBE_RADIUS = this.rad;
+        this.rad = (rad < 150 && rad !== 2) ? 150 : this.rad;
         
         // Projection translation from 2d to 3d from:
         // https://www.basedesign.com/blog/how-to-render-3d-in-2d-canvas
@@ -269,6 +270,23 @@ class Particle {
         this.theta = this.z < 0 ? this.theta + 0.03 : this.theta - 0.03;
         this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002) ;
     }
+
+    deflect() {
+        // this.phi = this.phi + 0.5;
+        this.theta = this.theta + 0.04;
+        this.rad = this.rad + 8;
+        this.project();
+
+        ctx.globalAlpha = Math.abs(1 - this.z / width);
+
+        ctx.beginPath();
+        //x, y ,r, angle-start, angle-end
+        ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
+
+        ctx.fillStyle = 'rgb(0, 212, 212)';
+        ctx.fill();
+    }
+
 
 }
 
@@ -315,7 +333,7 @@ function render(ctx) {
     
     if (loaded){
         density = 1300;
-        if (particles.length < 1000) {
+        if (particles.length < 1200) {
             inside = false;
             particles = [];
             for (let i = 0; i < density; i++) {
@@ -399,6 +417,9 @@ function render(ctx) {
     } else {
         for (let i = 0; i < particles.length; i++) {
             particles[i].draw();
+        }
+        for (let i = 0; i < repulsedParticles.length; i++) {
+            repulsedParticles[i].deflect();
         }
     }
 
