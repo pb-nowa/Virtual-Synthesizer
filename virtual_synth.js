@@ -236,8 +236,8 @@ class Particle {
         const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
         this.analyser.getFloatFrequencyData(dataArray);
 
-        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
-        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
+        this.rad = 200;//this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
+        rad = 200; //this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
         GLOBE_RADIUS = this.rad;
         
         // Projection translation from 2d to 3d from:
@@ -266,8 +266,8 @@ class Particle {
     }
 
     rotate() {
-        this.theta = this.z < 0 ? this.theta + 0.04 : this.theta - 0.04;
-        this.phi = this.phi + 0.04;
+        this.theta = this.z < 0 ? this.theta + 0.03 : this.theta - 0.03;
+        this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002) ;
     }
 
 }
