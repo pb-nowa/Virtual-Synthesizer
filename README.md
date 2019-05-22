@@ -28,4 +28,6 @@ As particles are unwound and become invisible to the observer, the motion algori
 
 ## Partical and musical interaction
 
-The particles display is a visual representation of the granular synthesis process. Each partical can be viewed as an individual audio sample being played back. 
+The particles are a visual representation of the granular synthesis process. Each particle can be viewed as an individual audio sample being played back. (Except that there are only 1300 instead of 12 million.) As the user mouses over the particle orb, the audio begins to granulate. Visually, this is represented by the unwinding of the particals away from the main sphere. Until the user removes their mouse from the sphere, the audio and sphere will continue to granulate. 
+
+
