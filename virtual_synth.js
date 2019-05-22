@@ -252,6 +252,7 @@ class Particle {
     }
 
     draw() {
+        this.rotate();
         this.project();
         //opacity based on distance
         ctx.globalAlpha = Math.abs(1 - this.z / width);
@@ -260,13 +261,13 @@ class Particle {
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
 
-        const r = 70;
-        const g = 255;
-        const b = 140;
-
-        const rgbString = "rgba(" + r + "," + g + "," + b + ")";
         ctx.fillStyle = 'rgb(0, 212, 212)';
         ctx.fill();
+    }
+
+    rotate() {
+        this.theta = this.z < 0 ? this.theta + 0.04 : this.theta - 0.04;
+        this.phi = this.phi + 0.04;
     }
 
 }
