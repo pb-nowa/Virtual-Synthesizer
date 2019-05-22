@@ -229,7 +229,11 @@ class Particle {
     }
 
     draw() {
-        this.rotate();
+        if (loaded){
+            this.rotate();
+        } else {
+            this.phi = this.z < 0 ? this.phi + 1.01 * Math.sqrt(this.phi * 0.0002) : this.phi - 1.01 * Math.sqrt(this.phi * 0.0002);
+        }
         this.project();
         //opacity based on distance
         ctx.globalAlpha = Math.abs(1 - this.z / width);
