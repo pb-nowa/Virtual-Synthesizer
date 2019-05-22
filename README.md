@@ -25,7 +25,7 @@ In order to create a 3D effect on a 2d canvas, an algorith is used to convert th
 ```js
   class Particle {
   
-  ...
+    ...
     
     //this function is called anytime a particle is rendered. 
     project() {
@@ -48,7 +48,7 @@ In order to create a 3D effect on a 2d canvas, an algorith is used to convert th
     }
   }
 
-
+```
 
 As particles are unwound and become invisible to the observer, the motion algorithm garbage-collects the distant particles. If the user mouses away from the main partical sphere, the particles move back into ordered state, and they are also garbage-collected.
 
