@@ -30,11 +30,9 @@ In order to create a 3D effect on a 2d canvas, an algorith is used to convert th
     //this function is called anytime a particle is rendered. 
     project() {
         //creates and array of data from the current audio. 
-        const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
-        this.analyser.getFloatFrequencyData(dataArray);
-
-        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
-        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
+        
+        ...
+        
         GLOBE_RADIUS = this.rad;
         this.rad = (rad < 150 && rad !== 2) ? 150 : this.rad;
         
@@ -59,3 +57,25 @@ As particles are unwound and become invisible to the observer, the motion algori
 The particles are a visual representation of the granular synthesis process. Each particle can be viewed as an individual audio sample being played back. (Except that there are only 1300 instead of 12 million.) As the user mouses over the orb, the audio begins to granulate. Visually, this is represented by the unwinding of the particals away from the main sphere. Until the user removes their mouse from the sphere, the audio and sphere will continue to granulate. 
 
 The orb reacts to the current audio source. Through the audio analysis node, the radius of the orb can adjust in real-time to the ebs and flows of the music. The FloatFrequencyData returns the decibel level as a full-scale number (-infinity as the softest signal and 0 as the loudest). Since dB full-scale is represented as a logarithmic response curve to match human hearing, I visually compensate by creating an orb radius floor of 200px, and multiplying the returned bit value exponentially. This also helps to smooth out the visual transitions when there are immediate changes in volume.
+
+```js
+  class Particle {
+  
+    ...
+    
+    //this function is called anytime a particle is rendered. 
+    project() {
+        //creates and array of data from the current audio. 
+        const dataArray = new Float32Array(this.analyser.frequencyBinCount);        
+        this.analyser.getFloatFrequencyData(dataArray);
+
+        this.rad = this.rad || (Math.pow(dataArray[12] + 75, 3/2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65)); 
+        rad = this.rad || (Math.pow(dataArray[12] + 75, 3 / 2) > 10000 ? 2 : Math.pow(dataArray[12] + 75, 1.65));
+        GLOBE_RADIUS = this.rad;
+        this.rad = (rad < 150 && rad !== 2) ? 150 : this.rad;
+        
+        ...
+    }
+  }
+
+```
