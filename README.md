@@ -28,6 +28,6 @@ As particles are unwound and become invisible to the observer, the motion algori
 
 ## Partical and musical interaction
 
-The particles are a visual representation of the granular synthesis process. Each particle can be viewed as an individual audio sample being played back. (Except that there are only 1300 instead of 12 million.) As the user mouses over the particle orb, the audio begins to granulate. Visually, this is represented by the unwinding of the particals away from the main sphere. Until the user removes their mouse from the sphere, the audio and sphere will continue to granulate. 
+The particles are a visual representation of the granular synthesis process. Each particle can be viewed as an individual audio sample being played back. (Except that there are only 1300 instead of 12 million.) As the user mouses over the orb, the audio begins to granulate. Visually, this is represented by the unwinding of the particals away from the main sphere. Until the user removes their mouse from the sphere, the audio and sphere will continue to granulate. 
 
-
+The orb reacts to the current audio source. Through the audio analysis node, the radius of the orb can adjust in real-time to the ebs and flows of the music. The FloatFrequencyData returns the decibel level as a full-scale number (-infinity as the softest signal and 0 as the loudest). Since dB full-scale is represented as a logarithmic response curve to match human hearing, I visually compensate by creating an orb radius floor of 200px, and multiplying the returned bit value exponentially. This also helps to smooth out the visual transitions when there are immediate changes in volume.
