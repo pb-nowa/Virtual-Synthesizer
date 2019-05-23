@@ -1,13 +1,13 @@
 # Granular Synth
 [Live Demo](https://granular-synth.herokuapp.com/)
 
-Granular Synth is an interactive audio visual display. Floating particles are displayed on a HTML5 Canvas in synchronicity with music. As the user uses their mouse to interact with the particles, the music goes through a granulating process, and the particles fly apart in opposing motion. 
+Granular Synth is an interactive audio visual display. Floating particles are displayed on a HTML5 Canvas in synchronicity with music. As the user mouses over the particles, the music is resampled through a granulating process, and the particles unwind from their original positions.
 
 ![Image of Granular Synth](https://github.com/pb-nowa/Virtual-Synthesizer/blob/master/assets/screenshots/granular-synth-main.gif)
 
 ## Technologies
 
-* Web Audio Api
+* Web Audio API
 * HTML5 Canvas
 
 ## What is Granular Synthesis?
