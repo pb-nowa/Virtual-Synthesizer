@@ -13,6 +13,7 @@ let mouse = {
     y: null
 };
 let inside = false;
+let isMouseOver = false;
 
 const c = new AudioContext();
 const master = c.createGain();
@@ -124,14 +125,12 @@ window.onload = () => {
             e.x < (width / 2) + radius - 30 &&
             e.x > (width / 2) - radius + 30
             ){          
-            // source.stop(c.currentTime + 1); 
-            // window.clearInterval(timerId);
+
             playGrains();
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
         } else {
             masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
-            // setStart();
         }
     });
 
@@ -140,13 +139,14 @@ window.onload = () => {
 const canvas = document.getElementById("sphere");
 const sphereBack = document.getElementById("sphere-background");
 
-
 sphereBack.addEventListener('mouseenter', e => {
     console.log(true);
+    isMouseOver = true;
 });
 
 sphereBack.addEventListener('mouseleave', e => {
     console.log(false);
+    isMouseOver = false;
 });
 
 let width = canvas.offsetWidth;

@@ -28,5 +28,5 @@ canvas {
   height: 40vh;
   width: 40vh;
   z-index: 6;
-  background-color: blue;
+  background-color: rgba(0, 0, 255, 0);
 }
