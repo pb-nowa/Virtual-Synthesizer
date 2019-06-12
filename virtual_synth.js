@@ -142,7 +142,11 @@ const sphereBack = document.getElementById("sphere-background");
 
 
 sphereBack.addEventListener('mouseenter', e => {
-    console.log(`${e.x}, ${e.y}`);
+    console.log(true);
+});
+
+sphereBack.addEventListener('mouseleave', e => {
+    console.log(false);
 });
 
 let width = canvas.offsetWidth;
