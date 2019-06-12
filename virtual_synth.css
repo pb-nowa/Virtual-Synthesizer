@@ -22,7 +22,7 @@ canvas {
   align-items: center;
   justify-content: center;
 }
-.sphere {
+#sphere-background {
   border-radius: 100%;
   height: 40vh;
   width: 40vh;

@@ -138,6 +138,12 @@ window.onload = () => {
 };
 
 const canvas = document.getElementById("sphere");
+const sphereBack = document.getElementById("sphere-background");
+
+
+sphereBack.addEventListener('mouseenter', e => {
+    console.log(`${e.x}, ${e.y}`);
+});
 
 let width = canvas.offsetWidth;
 let height = canvas.offsetHeight;
