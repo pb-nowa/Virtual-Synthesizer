@@ -35,7 +35,7 @@ h1 {
 
 h2 {
   color: rgb(218, 218, 218);
-  margin: 0 0 20px 0;
+  margin: 40px 0 20px 0;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 32px;
 }
@@ -47,6 +47,7 @@ p {
   text-align: center;
   line-height: 1.5;
   margin: 0 40px 0 40px;
+  max-width: 75vw;
 }
 
 .direction-container {
@@ -96,27 +97,29 @@ canvas {
 }
 
 @-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-  to {
-    opacity: 1;
-  }
+@keyframes fadeInAndOut {
+  0% { opacity: 0; }
+  50% { opacity: 0.95; }
+  100% { opacity: 0; }
 }
 
 .fadeIn {
   -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
-  animation-duration: 2.25s;
+  animation-duration: 2.75s;
+}
+
+.fadeInAndOut {
+  animation-name: fadeInAndOut;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
 }
