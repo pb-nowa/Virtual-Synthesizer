@@ -93,6 +93,7 @@ window.onload = () => {
             playing = false;
             window.clearInterval(timerId);
         }
+        document.getElementById('header-container').className = "header-container fade-out";
     });
 
     function setStart(){
