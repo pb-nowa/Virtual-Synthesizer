@@ -134,6 +134,15 @@ window.onload = () => {
         }
     });
 
+    const aboutPage = document.getElementById("about-page");
+    aboutPage.addEventListener('click', e => {
+        aboutPage.className = "about-page fade-out";
+        aboutPage.childNodes.forEach(node => {
+            node.className += " fade-out";
+        });
+        document.getElementById('header-container').className += " fadeIn";
+    });
+
 };
 
 const canvas = document.getElementById("sphere");
@@ -366,32 +375,32 @@ function render(ctx) {
         }
     } else {
     // load screen
-        if (!loadParticles[0].particles.length) {
-            for (let j = 0; j  < loadParticles.length; j++) {
-                for (let i = 0; i < density; i++) {
-                    loadParticles[j].particles.push(new Particle({ analyser, rad: loadParticles[j].saveRad }));
-                } 
-            }
-        } else {
-            for (let j = 0; j < loadParticles.length; j++) {
-                const preParticles = Array.from(loadParticles[j].particles);
-                loadParticles[j].particles = [];
-                const zoomSpeed = 25;
-                loadParticles[j].saveRad = (loadParticles[j].saveRad <= 0) ? loadRad : loadParticles[j].saveRad - zoomSpeed;
+        // if (!loadParticles[0].particles.length) {
+        //     for (let j = 0; j  < loadParticles.length; j++) {
+        //         for (let i = 0; i < density; i++) {
+        //             loadParticles[j].particles.push(new Particle({ analyser, rad: loadParticles[j].saveRad }));
+        //         } 
+        //     }
+        // } else {
+        //     for (let j = 0; j < loadParticles.length; j++) {
+        //         const preParticles = Array.from(loadParticles[j].particles);
+        //         loadParticles[j].particles = [];
+        //         const zoomSpeed = 25;
+        //         loadParticles[j].saveRad = (loadParticles[j].saveRad <= 0) ? loadRad : loadParticles[j].saveRad - zoomSpeed;
                 
-                for (let i = 0; i < density; i++) {
-                    loadParticles[j].particles.push(new Particle({
-                        analyser: analyser, 
-                        rad: loadParticles[j].saveRad,
-                        theta: preParticles[i].theta,
-                        phi: preParticles[i].phi,
-                        x: preParticles[i].x, 
-                        y: preParticles[i].y, 
-                        z: preParticles[i].z
-                    }));
-                } 
-            } 
-        }
+        //         for (let i = 0; i < density; i++) {
+        //             loadParticles[j].particles.push(new Particle({
+        //                 analyser: analyser, 
+        //                 rad: loadParticles[j].saveRad,
+        //                 theta: preParticles[i].theta,
+        //                 phi: preParticles[i].phi,
+        //                 x: preParticles[i].x, 
+        //                 y: preParticles[i].y, 
+        //                 z: preParticles[i].z
+        //             }));
+        //         } 
+        //     } 
+        // }
     }
     for (let i = 0; i < particles.length; i++){
         particles[i].project();

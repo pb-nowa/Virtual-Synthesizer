@@ -4,7 +4,7 @@ body {
   overflow: hidden;
 }
 
-.about-page {
+#about-page {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -12,9 +12,13 @@ body {
   justify-content: center;
   height: 100%;
   width: 100%;
-  background-color: rgb(0, 0, 0);
-  z-index: 15;
+  background-color: #111;
+  transition: 2s;
 } 
+
+.about-page {
+  z-index: 15;
+}
 
 .header-container {
   display: flex;
@@ -62,7 +66,7 @@ p {
 }
 
 li {
-  color: white;
+  color: rgb(218, 218, 218);
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 20px;
   line-height: 1.5;
@@ -115,11 +119,17 @@ canvas {
 .fadeIn {
   -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
-  animation-duration: 2.75s;
+  animation-duration: 3s;
 }
 
 .fadeInAndOut {
   animation-name: fadeInAndOut;
   animation-duration: 3s;
   animation-iteration-count: infinite;
+}
+
+.fade-out {
+  transition: 1s;
+  z-index: 0;
+  opacity: 0;
 }
