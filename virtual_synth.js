@@ -125,7 +125,7 @@ window.onload = () => {
             e.x < (width / 2) + radius - 30 &&
             e.x > (width / 2) - radius + 30
             ){          
-
+                
             playGrains();
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
