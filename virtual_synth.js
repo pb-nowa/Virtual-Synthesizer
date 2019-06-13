@@ -150,15 +150,19 @@ const sphereBack = document.getElementById("sphere-background");
 
 sphereBack.addEventListener('mouseenter', e => {
     isMouseOver = true;
-    playGrains();
-    masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
+    if (playing){
+        playGrains();
+        masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
+    }
 });
 
 sphereBack.addEventListener('mouseleave', e => {
     document.getElementById('header-container').className += " fadeIn";
     isMouseOver = false;
-    masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
-    window.clearTimeout(timeout);
+    if (playing){
+        masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
+        window.clearTimeout(timeout);
+    }
 });
 
 let width = canvas.offsetWidth;
