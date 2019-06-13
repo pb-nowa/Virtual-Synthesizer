@@ -98,7 +98,7 @@ canvas {
   height: 40vh;
   width: 40vh;
   z-index: 6;
-  background-color: rgba(171, 171, 248, 0.198);
+  background-color: rgba(171, 171, 248, 0);
 }
 
 @-webkit-keyframes fadeIn {

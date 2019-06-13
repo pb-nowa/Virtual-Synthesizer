@@ -165,6 +165,12 @@ sphereBack.addEventListener('mouseleave', e => {
     }
 });
 
+sphereBack.addEventListener('mousemove', (e) => {
+    const radius = 200;
+    mouse.x = e.x;
+    mouse.y = e.y;
+});
+
 let width = canvas.offsetWidth;
 let height = canvas.offsetHeight;
 
