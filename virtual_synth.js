@@ -87,13 +87,14 @@ window.onload = () => {
             timerId = window.setInterval(() => {
                 timer++;
             }, 1000);
+            document.getElementById('header-container').className = "header-container fade-out";
         } else {
             bus.gain.linearRampToValueAtTime(0, c.currentTime + 0.5);
             source.stop(c.currentTime + 0.5);
             playing = false;
             window.clearInterval(timerId);
+            document.getElementById('header-container').className = "header-container fadeIn";
         }
-        document.getElementById('header-container').className = "header-container fade-out";
     });
 
     function setStart(){
@@ -210,7 +211,7 @@ let particles = [];
 let repulsedParticles = [];
 
 class Particle {
-    constructor({analyser, theta, phi, x, y, z, rad}) {
+    constructor({analyser, theta, phi, x, y, z, rad, timer}) {
         this.analyser = analyser;
 
         this.theta = theta || Math.random() * 2 * Math.PI;
@@ -225,6 +226,7 @@ class Particle {
         this.yProjected = y || 0;
         this.scaleProjected = z || 0;
         this.rad = rad || 0; 
+        this.timer = timer || 0;
 
     }
 
@@ -317,6 +319,7 @@ let loadParticles = [
 
 let loadIdx = 0;
 let saveRad = 1200;
+let replenish = [];
 
 function render(ctx) {
     ctx.clearRect(0, 0, width, height);
@@ -333,10 +336,11 @@ function render(ctx) {
     
     if (loaded){
         density = 1300;
-        if (particles.length < 1200) {
+        console.log(repulsedParticles.length);
+        if (!particles.length) {
             inside = false;
             particles = [];
-            for (let i = 0; i < density; i++) {
+            for (let i = particles.length; i < density; i++) {
                 particles.push(new Particle({ analyser }));
             }
         } else {
@@ -348,18 +352,17 @@ function render(ctx) {
                     mouse.y - preParticles[i].yProjected < 10 &&
                     mouse.y - preParticles[i].yProjected > -10) {
                     inside = true;
-                    if (repulsedParticles.length > 900){
-                        //garbage collection
-                        repulsedParticles.shift();
-                    }    
+                   
                     repulsedParticles.push(new Particle({
                         analyser: analyser,
                         theta: preParticles[i].theta,
                         phi: preParticles[i].phi,
                         x: preParticles[i].x,
                         y: preParticles[i].y,
-                        z: preParticles[i].z
+                        z: preParticles[i].z,
                     }));
+                    particles.push(new Particle({ analyser, rad: preParticles[i].rad }));
+                
                 } else {
                     const rad = inside ? preParticles[i].rad : 0; 
                     particles.push(new Particle({
@@ -403,6 +406,8 @@ function render(ctx) {
         //     } 
         // }
     }
+
+    
     for (let i = 0; i < particles.length; i++){
         particles[i].project();
     }
@@ -422,10 +427,15 @@ function render(ctx) {
         for (let i = 0; i < particles.length; i++) {
             particles[i].draw();
         }
+
         for (let i = 0; i < repulsedParticles.length; i++) {
+            repulsedParticles[i].timer++;
             repulsedParticles[i].deflect();
         }
     }
+
+    //garbage collect particles at 200 frames;
+    repulsedParticles = repulsedParticles.filter(particle => particle.timer < 200);
 
     // granulate();
     window.requestAnimationFrame(() => render(ctx));

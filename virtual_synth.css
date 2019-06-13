@@ -25,13 +25,14 @@ body {
   height: 0;
   width: 100%;
   justify-content: center;
+  opacity: 0;
 }
 
 h1 {
   position: absolute;
   height: 0;
   margin: 0;
-  color: rgb(218, 218, 218);
+  color: rgb(138, 138, 138);
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: 40px;
   top: 20px;
@@ -97,7 +98,7 @@ canvas {
   height: 40vh;
   width: 40vh;
   z-index: 6;
-  background-color: rgba(0, 0, 255, 0);
+  background-color: rgba(171, 171, 248, 0.198);
 }
 
 @-webkit-keyframes fadeIn {
