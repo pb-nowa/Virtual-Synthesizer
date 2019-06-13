@@ -14,6 +14,7 @@ let mouse = {
 };
 let inside = false;
 let isMouseOver = false;
+let timeout;
 
 const c = new AudioContext();
 const master = c.createGain();
@@ -139,13 +140,14 @@ const sphereBack = document.getElementById("sphere-background");
 sphereBack.addEventListener('mouseenter', e => {
     isMouseOver = true;
     playGrains();
-    window.setTimeout(playGrains, Math.random() * 275);
     masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
 });
 
 sphereBack.addEventListener('mouseleave', e => {
     document.getElementById('header-container').className += " fadeIn";
     isMouseOver = false;
+    masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
+    window.clearTimeout(timeout);
 });
 
 let width = canvas.offsetWidth;
@@ -155,6 +157,7 @@ const ctx = canvas.getContext('2d');
 
 function playGrains() {
     const grain = new Grain(c, buffer, reverbBus, timer);
+    timeout = window.setTimeout(playGrains, Math.random() * 275);
 }
 
 let isGranulating = false;
