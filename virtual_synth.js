@@ -120,18 +120,6 @@ window.onload = () => {
         const radius = 200;
         mouse.x = e.x;
         mouse.y = e.y;
-        console.log("loaded", loaded, "playing", playing, "ismouseover", isMouseOver);
-        if (loaded && 
-            playing &&
-            isMouseOver
-            ){          
-            console.log("playing");
-            playGrains();
-            window.setTimeout(playGrains, Math.random() * 275);
-            masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
-        } else {
-            masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
-        }
     });
 
     const aboutPage = document.getElementById("about-page");
