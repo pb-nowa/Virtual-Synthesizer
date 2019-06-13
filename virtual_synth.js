@@ -21,7 +21,7 @@ const master = c.createGain();
 const masterbus = c.createGain();
 const reverbBus = c.createGain();
 let rad = 2;
-let Q = 12;
+let Q = 1;
 
 const delay = new DelayNode(c, {
     delayTime: 0.4,
@@ -30,8 +30,15 @@ const delay = new DelayNode(c, {
 
 const bandpass = new BiquadFilterNode(c, {
     type: 'bandpass',
-    // frequency: 10,
-    Q: Q
+    frequency: 500,
+    Q: Q,
+    gain: 200,
+});
+
+const notch = new BiquadFilterNode(c, {
+    type: 'notch',
+    frequency: 1500,
+    Q: 100,
 });
 
 let lfo = new OscillatorNode(c, {
@@ -51,7 +58,11 @@ let convolver;
 async function setReverb() {
     convolver = c.createConvolver();
     convolver.buffer = await getBuffer(c, '/assets/audio/large_hall.wav');
-    reverbBus.connect(convolver).connect(bandpass).connect(master);
+    reverbBus.connect(convolver)
+    .connect(bandpass)
+    .connect(notch)
+    .connect(master);
+    reverbBus.gain.setValueAtTime(2, c.currentTime);
 }
 
 setReverb();

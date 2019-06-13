@@ -12,10 +12,7 @@ class Grain {
         this.bus = this.context.createGain();
         // this.source.connect(this.bus);
         this.source.connect(reverbBus);
-        this.bus.gain.setValueAtTime(2, this.now);
         this.bus.connect(this.context.destination);
-
-        // this.bus.connect(convolver);
 
         this.playGrain();
     }
@@ -23,9 +20,9 @@ class Grain {
     playGrain() {
         this.source.start(this.now, Math.random() * 0.5 + this.playbackSampleStart + 3, this.attack + this.sustain + this.release);
         this.bus.gain.setValueAtTime(0, this.now);
-        // value, endtime
-        this.bus.gain.linearRampToValueAtTime(10, this.now + this.attack);
-        this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.sustain + this.release - 0.01);
+        
+        this.bus.gain.linearRampToValueAtTime(100, this.now + this.attack);
+        this.bus.gain.linearRampToValueAtTime(0, this.now + this.attack + this.sustain + this.release - 0.0025);
     }
 }
 
