@@ -120,14 +120,12 @@ window.onload = () => {
         const radius = 200;
         mouse.x = e.x;
         mouse.y = e.y;
+        console.log("loaded", loaded, "playing", playing, "ismouseover", isMouseOver);
         if (loaded && 
             playing &&
-            e.y < (height / 2) + radius - 30 &&
-            e.y > (height / 2) - radius + 30 &&
-            e.x < (width / 2) + radius - 30 &&
-            e.x > (width / 2) - radius + 30
+            isMouseOver
             ){          
-                
+            console.log("playing");
             playGrains();
             window.setTimeout(playGrains, Math.random() * 275);
             masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
@@ -151,12 +149,14 @@ const canvas = document.getElementById("sphere");
 const sphereBack = document.getElementById("sphere-background");
 
 sphereBack.addEventListener('mouseenter', e => {
-    console.log(true);
     isMouseOver = true;
+    playGrains();
+    window.setTimeout(playGrains, Math.random() * 275);
+    masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
 });
 
 sphereBack.addEventListener('mouseleave', e => {
-    console.log(false);
+    document.getElementById('header-container').className += " fadeIn";
     isMouseOver = false;
 });
 
@@ -336,7 +336,6 @@ function render(ctx) {
     
     if (loaded){
         density = 1300;
-        console.log(repulsedParticles.length);
         if (!particles.length) {
             inside = false;
             particles = [];
