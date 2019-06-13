@@ -372,7 +372,7 @@ function render(ctx) {
                         y: preParticles[i].y,
                         z: preParticles[i].z,
                     }));
-                    particles.push(new Particle({ analyser, rad: preParticles[i].rad }));
+                    particles.push(new Particle({ analyser, rad: 0 }));
                 
                 } else {
                     const rad = inside ? preParticles[i].rad : 0; 
@@ -383,7 +383,6 @@ function render(ctx) {
                         x: preParticles[i].x, 
                         y: preParticles[i].y, 
                         z: preParticles[i].z,
-                        rad
                     }));
                 }
             }  
