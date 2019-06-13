@@ -97,7 +97,7 @@ window.onload = () => {
             bus.connect(masterbus);
             playing = true;
             timerId = window.setInterval(() => {
-                timer++;
+                if (!isMouseOver) timer++;
             }, 1000);
             document.getElementById('header-container').className = "header-container fade-out";
         } else {
