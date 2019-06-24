@@ -15,6 +15,8 @@ let mouse = {
 let inside = false;
 let isMouseOver = false;
 let timeout;
+let color = [0, 212, 212];
+let colorClock = 0;
 
 const c = new AudioContext();
 const master = c.createGain();
@@ -276,7 +278,7 @@ class Particle {
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
 
-        ctx.fillStyle = 'rgb(0, 212, 212)';
+        ctx.fillStyle = `rgb(${color})`;
         ctx.fill();
     }
 
@@ -297,7 +299,8 @@ class Particle {
         //x, y ,r, angle-start, angle-end
         ctx.arc(this.xProjected, this.yProjected, PARTICLE_RADIUS * this.scaleProjected, 0, Math.PI * 2);
 
-        ctx.fillStyle = 'rgb(0, 212, 212)';
+        // ctx.fillStyle = 'rgb(0, 212, 212)';
+        ctx.fillStyle = `rgb(${color})`;
         ctx.fill();
     }
 
@@ -333,7 +336,13 @@ let loadIdx = 0;
 let saveRad = 1200;
 let replenish = [];
 
+
 function render(ctx) {
+    const r = 0;
+    let g = Math.floor((212 + colorClock) * 0.4 % 64) + 212 - 32;
+    let b = Math.floor((colorClock) * 0.5 % 64) + 212 - 32;
+    color = [r, g, b];
+    console.log(g, b);
     ctx.clearRect(0, 0, width, height);
 
     let loadRad = 1200;
@@ -448,6 +457,7 @@ function render(ctx) {
     repulsedParticles = repulsedParticles.filter(particle => particle.timer < 200);
 
     // granulate();
+    colorClock++;
     window.requestAnimationFrame(() => render(ctx));
 }
 
