@@ -184,17 +184,7 @@ function playGrains() {
 }
 
 let isGranulating = false;
-// function granulate(){
-//     if (loaded && inside && !isGranulating){          
-//         isGranulating = true;
-//         playGrains();
-//         window.setTimeout(playGrains, Math.random() * 275);
-//         masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
-//     } else if (!inside){
-//         isGranulating = false;
-//         masterbus.gain.linearRampToValueAtTime(1.5, c.currentTime + 0.5);
-//     } 
-// }
+
 
 function onResize() {
     width = canvas.offsetWidth;
@@ -339,10 +329,9 @@ let replenish = [];
 
 function render(ctx) {
     const r = 0;
-    let g = Math.floor((212 + colorClock) * 0.4 % 64) + 212 - 32;
-    let b = Math.floor((colorClock) * 0.5 % 64) + 212 - 32;
+    let g = 212;// Math.floor((212 + colorClock) * 0.4 % 64) + 212 - 32;
+    let b = 212; //Math.floor((colorClock) * 0.5 % 64) + 212 - 32;
     color = [r, g, b];
-    console.log(g, b);
     ctx.clearRect(0, 0, width, height);
 
     let loadRad = 1200;
