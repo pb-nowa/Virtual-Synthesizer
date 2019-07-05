@@ -266,6 +266,7 @@ class Particle {
 }
 
 
+
 let density = 30;
 
 const play = new Image();
@@ -283,6 +284,9 @@ function draw(ctx, img, x, y, w, h){
         ctx.drawImage(img, x, y, w, h);
     }
 }
+
+
+
 
 function render(params) {
     const { ctx } = params;
@@ -371,11 +375,11 @@ function render(params) {
     window.requestAnimationFrame(() => render({ ctx }));
 }
 
+
+
 function init() {
     window.requestAnimationFrame(() => render({ ctx }));
 }
-
-
 
 
 
@@ -392,7 +396,6 @@ function setStart() {
         timer++;
     }, 1000);
 }
-
 
 
 const aboutPage = document.getElementById("about-page");
