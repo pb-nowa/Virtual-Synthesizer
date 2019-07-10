@@ -1,4 +1,7 @@
-import { width, height } from './canvas';
+import canvas from './canvas';
+
+let width = canvas.offsetWidth;
+let height = canvas.offsetHeight;
 
 const PERSPECTIVE = width * 0.8;
 const PROJECTION_CENTER_X = width / 2;

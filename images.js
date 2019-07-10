@@ -5,6 +5,7 @@ export const pause = new Image();
 pause.src = "./assets/images/pause.png";
 
 export const draw = (ctx, img, x, y, w, h) => {
+
     if (!img.complete) {
         setTimeout(() => {
             draw(ctx, img);
@@ -13,4 +14,5 @@ export const draw = (ctx, img, x, y, w, h) => {
     } else {
         ctx.drawImage(img, x, y, w, h);
     }
+    
 };

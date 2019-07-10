@@ -1,16 +1,23 @@
 import Grain from './grain.js';
-import { getBuffer } from './get_buffer';
+import canvas from './canvas';
+import aboutPage from './about_page';
 import { play, pause, draw } from './images';
-import { canvas, ctx, width, height } from './canvas';
+import { getBuffer } from './get_buffer';
 import Particle from './particle';
 
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 
+const ctx = canvas.getContext('2d');
+let width = canvas.offsetWidth;
+let height = canvas.offsetHeight;
+
+window.addEventListener('resize', onResize);
+onResize();
+
+
 let playing = false;
-let loaded = false;
-let isGranulating = false;
 let timer = 1;
 let timerId;
 let source;
@@ -19,7 +26,6 @@ let mouse = {
     x: null,
     y: null
 };
-let inside = false;
 let isMouseOver = false;
 let timeout;
 
@@ -84,7 +90,6 @@ async function initBuffer() {
 
     Array.prototype.reverse.call(revBuffer.getChannelData(0));
     Array.prototype.reverse.call(revBuffer.getChannelData(1));
-    loaded = true; 
     Particle.prototype.loaded();
 }
 
@@ -92,12 +97,26 @@ initBuffer();
 
 
 
+canvas.addEventListener('mousemove', (e) => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+});
 
+function onResize() {
+    width = canvas.offsetWidth;
+    height = canvas.offsetHeight;
 
+    if (window.devicePixelRatio > 1) {
+        canvas.width = canvas.clientWidth * 2;
+        canvas.height = canvas.clientHeight * 2;
+        ctx.scale(2, 2);
+    } else {
+        canvas.width = width;
+        canvas.height = height;
+    }
+}
 
-
-
-canvas.addEventListener('click', function () {
+canvas.addEventListener('click', function() {
     const bus = c.createGain();
 
     if (!playing) {
@@ -126,22 +145,17 @@ canvas.addEventListener('click', function () {
     }
 });
 
-canvas.addEventListener('mousemove', (e) => {
-    const radius = 200;
-    mouse.x = e.x;
-    mouse.y = e.y;
-});
 
-
-
-
-
+let particles = [];
+let repulsedParticles = [];
+let density = 30;
+let inside = false;
 
 const sphereBack = document.getElementById("sphere-background");
 
 sphereBack.addEventListener('mouseenter', e => {
     isMouseOver = true;
-    if (playing){
+    if (playing) {
         playGrains();
         masterbus.gain.linearRampToValueAtTime(0, c.currentTime + 1);
     }
@@ -150,39 +164,34 @@ sphereBack.addEventListener('mouseenter', e => {
 sphereBack.addEventListener('mouseleave', e => {
     document.getElementById('header-container').className += " fadeIn";
     isMouseOver = false;
-    if (playing){
+    if (playing) {
         masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
-        window.clearTimeout(timeout);``
+        window.clearTimeout(timeout); ``
     }
 });
 
 sphereBack.addEventListener('mousemove', (e) => {
-    const radius = 200;
     mouse.x = e.x;
     mouse.y = e.y;
 });
 
 
 
-let particles = [];
-let repulsedParticles = [];
-let density = 30;
-
-
-function render(params) {
+const render = (params) => {
     const { ctx } = params;
 
     ctx.clearRect(0, 0, width, height);
 
     //play and pause button
-    if (loaded) {
+    if (Particle.isLoaded()) {
         if (playing) {
             draw(ctx, pause, width / 2 - 37.5, height - 105, 75, 50);
         } else {
             draw(ctx, play, width / 2 - 75, height - 130, 150, 100);
         }
- 
+
         density = 1300;
+
         if (!particles.length) {
             inside = false;
             particles = [];
@@ -191,6 +200,7 @@ function render(params) {
             }
         } else {
             const preParticles = Array.from(particles);
+
             particles = [];
             for (let i = 0; i < preParticles.length; i++) {
                 if (mouse.x - preParticles[i].xProjected < 10 &&
@@ -198,7 +208,7 @@ function render(params) {
                     mouse.y - preParticles[i].yProjected < 10 &&
                     mouse.y - preParticles[i].yProjected > -10) {
                     inside = true;
-                   
+
                     repulsedParticles.push(new Particle({
                         ctx,
                         analyser: analyser,
@@ -207,22 +217,22 @@ function render(params) {
                         z: preParticles[i].z,
                     }));
                     particles.push(new Particle({ ctx, analyser, rad: 0 }));
-                
+
                 } else {
                     particles.push(new Particle({
                         ctx,
-                        analyser: analyser, 
+                        analyser: analyser,
                         theta: preParticles[i].theta,
                         phi: preParticles[i].phi,
                         z: preParticles[i].z,
                     }));
                 }
-            }  
+            }
         }
-    } 
+    }
 
-    
-    for (let i = 0; i < particles.length; i++){
+
+    for (let i = 0; i < particles.length; i++) {
         particles[i].project();
     }
 
@@ -231,7 +241,7 @@ function render(params) {
         return dot1.sizeProjection - dot2.sizeProjection;
     });
 
-    if (loaded) {
+    if (Particle.isLoaded()) {
         for (let i = 0; i < particles.length; i++) {
             particles[i].draw();
         }
@@ -247,22 +257,12 @@ function render(params) {
 
     // granulate();
     window.requestAnimationFrame(() => render({ ctx }));
-}
+};
 
-
-
-function init(ctx) {
+const init = (ctx) => {
     window.requestAnimationFrame(() => render({ ctx }));
-}
+};
 
-const aboutPage = document.getElementById("about-page");
-aboutPage.addEventListener('click', e => {
-    aboutPage.className = "about-page fade-out";
-    aboutPage.childNodes.forEach(node => {
-        node.className += " fade-out";
-    });
-    document.getElementById('header-container').className += " fadeIn";
-});
 
 
 init(ctx);
