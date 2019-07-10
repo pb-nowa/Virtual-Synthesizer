@@ -78,11 +78,14 @@ analyser.connect(c.destination);
 let revBuffer;
 
 async function initBuffer() {
-    buffer = await getBuffer(c, '/assets/audio/reverie.mp3');
-    revBuffer = await getBuffer(c, '/assets/audio/reverie.mp3');
+    [buffer, revBuffer] = await Promise.all([getBuffer(c, '/assets/audio/reverie.mp3'), getBuffer(c, '/assets/audio/reverie.mp3')]);
+    // buffer = getBuffer(c, '/assets/audio/reverie.mp3');
+    // revBuffer = getBuffer(c, '/assets/audio/reverie.mp3');
+
     Array.prototype.reverse.call(revBuffer.getChannelData(0));
     Array.prototype.reverse.call(revBuffer.getChannelData(1));
     loaded = true;
+  
 }
 
 initBuffer();
