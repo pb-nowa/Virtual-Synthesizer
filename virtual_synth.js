@@ -1,5 +1,6 @@
 import Grain from './grain.js';
 import { getBuffer } from './get_buffer';
+import { play, pause, draw } from './images';
 
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -78,14 +79,14 @@ analyser.connect(c.destination);
 let revBuffer;
 
 async function initBuffer() {
-    [buffer, revBuffer] = await Promise.all([getBuffer(c, '/assets/audio/reverie.mp3'), getBuffer(c, '/assets/audio/reverie.mp3')]);
-    // buffer = getBuffer(c, '/assets/audio/reverie.mp3');
-    // revBuffer = getBuffer(c, '/assets/audio/reverie.mp3');
+    [buffer, revBuffer] = await Promise.all([
+        getBuffer(c, '/assets/audio/reverie.mp3'), 
+        getBuffer(c, '/assets/audio/reverie.mp3')]
+    );
 
     Array.prototype.reverse.call(revBuffer.getChannelData(0));
     Array.prototype.reverse.call(revBuffer.getChannelData(1));
-    loaded = true;
-  
+    loaded = true; 
 }
 
 initBuffer();
@@ -168,7 +169,7 @@ sphereBack.addEventListener('mouseleave', e => {
     isMouseOver = false;
     if (playing){
         masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
-        window.clearTimeout(timeout);
+        window.clearTimeout(timeout);``
     }
 });
 
@@ -272,21 +273,9 @@ class Particle {
 
 let density = 30;
 
-const play = new Image();
-play.src = "./assets/images/play_icon_hero.png";
-const pause = new Image();
-pause.src = "./assets/images/pause.png";
 
-function draw(ctx, img, x, y, w, h){
-    if (!img.complete) {
-        setTimeout(() => {
-            draw(ctx, img);
-        }, 500);
-        return;
-    } else {
-        ctx.drawImage(img, x, y, w, h);
-    }
-}
+
+
 
 
 
