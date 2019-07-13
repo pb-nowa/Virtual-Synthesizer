@@ -147,6 +147,8 @@ canvas.addEventListener('click', function() {
 });
 
 
+
+
 let particles = [];
 let repulsedParticles = [];
 let density = 30;
