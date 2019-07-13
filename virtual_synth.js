@@ -167,7 +167,7 @@ sphereBack.addEventListener('mouseleave', e => {
     isMouseOver = false;
     if (playing) {
         masterbus.gain.linearRampToValueAtTime(1, c.currentTime + 1);
-        window.clearTimeout(timeout); ``
+        window.clearTimeout(timeout); 
     }
 });
 
