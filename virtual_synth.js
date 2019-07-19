@@ -88,8 +88,8 @@ async function initBuffer() {
         getBuffer(c, '/assets/audio/reverie.mp3')]
     );
 
-    Array.prototype.reverse.call(revBuffer.getChannelData(0));
-    Array.prototype.reverse.call(revBuffer.getChannelData(1));
+    // Array.prototype.reverse.call(revBuffer.getChannelData(0));
+    // Array.prototype.reverse.call(revBuffer.getChannelData(1));
     Particle.prototype.loaded();
 }
 
@@ -179,6 +179,7 @@ sphereBack.addEventListener('mousemove', (e) => {
 
 
 const render = (params) => {
+    console.log(Particle.isLoaded());
     const { ctx } = params;
 
     ctx.clearRect(0, 0, width, height);
