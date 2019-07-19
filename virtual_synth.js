@@ -181,6 +181,7 @@ sphereBack.addEventListener('mousemove', (e) => {
 
 
 const render = (params) => {
+    console.log(Particle.isLoaded());
     const { ctx } = params;
 
     ctx.clearRect(0, 0, width, height);
@@ -235,9 +236,9 @@ const render = (params) => {
     }
 
 
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].project();
-    }
+    // for (let i = 0; i < particles.length; i++) {
+    //     particles[i].project();
+    // }
 
     //sort particles by their z index 
     particles.sort((dot1, dot2) => {
